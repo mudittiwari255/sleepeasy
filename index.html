@@ -3,12 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Indian Atlas Sleep</title>
+    <title>Atlas Sleep: Voice Hypnosis</title>
     <style>
-        /* SLEEP UI: Pitch Black */
+        /* --- SLEEP UI: Deep Red Mode --- */
         body {
             background-color: #000000;
-            color: #555;
+            color: #8a3333; 
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             display: flex;
             flex-direction: column;
@@ -18,78 +18,45 @@
             margin: 0;
             overflow: hidden;
             touch-action: manipulation;
+            user-select: none;
         }
 
+        /* --- STARFIELD --- */
         #stars-container {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            overflow: hidden;
-            z-index: -1;
+            top: 0; left: 0; width: 100%; height: 100%;
+            overflow: hidden; z-index: -1;
+            opacity: 0.5;
+            perspective: 1000px;
         }
-
-        .star-layer {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            transform-style: preserve-3d;
-        }
-
-        .star-layer.layer-1 { animation: space-travel-1 180s linear infinite; }
-        .star-layer.layer-2 { animation: space-travel-2 120s linear infinite; }
-        .star-layer.layer-3 { animation: space-travel-3 60s linear infinite; }
-
+        
         .star {
             position: absolute;
             border-radius: 50%;
-            background-color: #fff;
+            background-color: #552222; 
         }
 
-        @keyframes space-travel-1 {
-            from { transform: translateY(0px); }
-            to   { transform: translateY(-200px); }
-        }
-        @keyframes space-travel-2 {
-            from { transform: translateY(0px); }
-            to   { transform: translateY(-400px); }
-        }
-        @keyframes space-travel-3 {
-            from { transform: translateY(0px); }
-            to   { transform: translateY(-600px); }
-        }
-
-        /* The Breathing Core */
+        /* --- BREATHING CORE --- */
         #core {
-            width: 100px;
-            height: 100px;
+            width: 120px;
+            height: 120px;
             border-radius: 50%;
-            background: #0D0D15;
-            transition: all 1s ease;
-            box-shadow: 0 0 20px rgba(12, 12, 20, 0.8), inset 0 0 15px rgba(12, 12, 20, 0.9);
-            margin-bottom: 40px;
+            background: #0D0505;
+            transition: all 0.5s ease;
+            box-shadow: 0 0 20px rgba(40, 10, 10, 0.4);
+            margin-bottom: 50px;
             z-index: 1;
         }
 
-        /* States */
         .listening {
-            background: #152838 !important; /* Muted Navy */
-            animation: breathe 5s infinite ease-in-out;
-            box-shadow: 
-                0 0 40px rgba(30, 60, 90, 0.6),
-                0 0 80px rgba(50, 100, 150, 0.3),
-                inset 0 0 20px rgba(30, 60, 90, 0.5);
+            background: #1a0808 !important;
+            animation: breathe 4s infinite ease-in-out;
+            box-shadow: 0 0 50px rgba(80, 20, 20, 0.3);
         }
         .speaking {
-            background: #382815 !important; /* Muted Amber */
-             box-shadow: 
-                0 0 35px rgba(90, 60, 30, 0.5),
-                0 0 70px rgba(140, 90, 50, 0.2),
-                inset 0 0 15px rgba(90, 60, 30, 0.4);
+            background: #2b1d10 !important; 
             transform: scale(1.05);
+            box-shadow: 0 0 40px rgba(100, 60, 20, 0.2);
         }
 
         @keyframes breathe {
@@ -99,477 +66,467 @@
         }
 
         #status {
-            font-size: 18px;
+            font-size: 20px;
             font-weight: 300;
-            color: #444;
+            color: #8a3333;
             min-height: 24px;
             text-align: center;
             z-index: 1;
+            letter-spacing: 1px;
+            transition: opacity 1s;
         }
 
-        /* Controls */
+        /* --- CONTROLS --- */
         .controls {
             position: absolute;
-            bottom: 50px;
+            bottom: 40px;
             display: flex;
             flex-direction: column;
             gap: 15px;
-            width: 80%;
-            max-width: 300px;
-            z-index: 1;
+            width: 85%;
+            max-width: 320px;
+            z-index: 2;
+            transition: opacity 1s;
         }
-        
+
         .persistent-controls {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            display: flex;
-            gap: 10px;
-            align-items: center;
-            opacity: 0;
-            animation: fadeIn 1s ease 0.5s forwards;
-            z-index: 1;
+            top: 20px; right: 20px;
+            display: flex; gap: 10px;
+            opacity: 0.4;
+            z-index: 2;
         }
 
-        select {
-            padding: 12px;
-            background: #111;
-            color: #888;
-            border: 1px solid #333;
-            border-radius: 8px;
-            font-size: 14px;
+        select, button {
+            padding: 14px;
+            background: #110505;
+            color: #8a3333;
+            border: 1px solid #331111;
+            border-radius: 12px;
+            font-size: 15px;
             outline: none;
-            width: 100%;
-        }
-
-        button {
-            padding: 16px;
-            background: #222;
-            color: #ccc;
-            border: none;
-            border-radius: 30px;
-            font-size: 16px;
             cursor: pointer;
+        }
+        
+        button {
+            font-weight: 500;
+            background: #1a0808;
             transition: background 0.2s;
         }
-        button:active { background: #333; }
-        
-        .hidden { display: none !important; }
 
-        @keyframes fadeIn {
-            to { opacity: 0.5; }
-        }
+        button:active { background: #2f0f0f; }
+        .hidden { opacity: 0; pointer-events: none; }
     </style>
 </head>
 <body>
 
-        <div id="stars-container">
-            <div class="star-layer layer-1"></div>
-            <div class="star-layer layer-2"></div>
-            <div class="star-layer layer-3"></div>
+    <div id="stars-container"></div>
+    <div id="core"></div>
+    <div id="status">...</div>
+
+    <div class="persistent-controls">
+        <select id="soundSelect" onchange="soundChanged()">
+            <option value="none">Silence</option>
+            <option value="rain">Deep Rain</option>
+            <option value="brown">Brown Noise</option>
+        </select>
+        <button onclick="toggleSound()" id="soundBtn">Sound: Off</button>
+    </div>
+
+    <div class="controls" id="setupPanel">
+        <div style="text-align:center; margin-bottom:15px; font-size:13px; color:#622; line-height: 1.5;">
+            <strong>Hypnotic Voice Engine</strong><br>
+            I will slow down as we play.<br>
+            Drifting Mode starts after 60s of silence.
         </div>
-        <div id="core"></div>
-
-        <div id="status">...</div>
-
-    
-        <div class="persistent-controls">
-            <select id="soundSelect" onchange="soundChanged()">
-                <option value="none">No Sound</option>
-                <option value="rain">Rain</option>
-                <option value="white">White Noise</option>
-                <option value="pink">Pink Noise</option>
-            </select>
-            <button onclick="toggleSound()" id="soundBtn">Turn On</button>
-        </div>
-
-        <div class="controls" id="setupPanel">
-            <select id="voiceSelect" onchange="testVoice()">
-                <option value="">Loading voices...</option>
-            </select>
-            <div style="display: flex; gap: 10px;">
-                <button onclick="initGame()" style="flex:2;">Start Sleep Session</button>
-            </div>
-        </div>
-
-    
-
-    <script src="cities.js"></script>
+        
+        <select id="voiceSelect" onchange="testVoice()">
+            <option value="">Loading voices...</option>
+        </select>
+        
+        <button onclick="startSession()" style="font-size: 16px; padding: 18px; border: 1px solid #522;">
+            Begin Sleep Session
+        </button>
+    </div>
 
     <script>
-        // --- STARFIELD ---
+        // --- 0. DATA ---
+        const CITIES_DB = [
+            "Mumbai", "Delhi", "Bangalore", "Hyderabad", "Ahmedabad", "Chennai", "Kolkata", "Surat", "Pune", "Jaipur", "Lucknow", "Kanpur", "Nagpur", "Indore", "Thane", "Bhopal", "Visakhapatnam", "Pimpri", "Patna", "Vadodara", "Ghaziabad", "Ludhiana", "Agra", "Nashik", "Faridabad", "Meerut", "Rajkot", "Varanasi", "Srinagar", "Aurangabad", "Dhanbad", "Amritsar", "Navi Mumbai", "Allahabad", "Ranchi", "Howrah", "Coimbatore", "Jabalpur", "Gwalior", "Vijayawada", "Jodhpur", "Madurai", "Raipur", "Kota", "Guwahati", "Chandigarh", "Solapur", "Hubli", "Mysore", "Tiruchirappalli", "Bareilly", "Aligarh", "Tiruppur", "Gurgaon", "Moradabad", "Jalandhar", "Bhubaneswar", "Salem", "Warangal", "Thiruvananthapuram", "Bhiwandi", "Saharanpur", "Gorakhpur", "Guntur", "Bikaner", "Amravati", "Noida", "Jamshedpur", "Bhilai", "Cuttack", "Firozabad", "Kochi", "Bhavnagar", "Dehradun", "Durgapur", "Asansol", "Nanded", "Kolhapur", "Ajmer", "Gulbarga", "Jamnagar", "Ujjain", "Loni", "Siliguri", "Jhansi", "Ulhasnagar", "Jammu", "Sangli", "Erode", "Goa", "Anand", "Ratlam", "Moga", "Abohar", "Rewa", "Puri", "Haldwani", "Karnal", "Panipat", "Rohtak", "Hisar", "Shimla", "Manali", "Kullu", "Rishikesh", "Haridwar", "Nainital", "Mussoorie", "Almora", "Pithoragarh", "Champawat", "Bageshwar", "Tezpur", "Imphal", "Shillong", "Aizawl", "Kohima", "Gangtok", "Agartala", "Itanagar", "Dispur", "Dimapur", "Silchar", "Dibrugarh", "Jorhat", "Nagaon", "Tinsukia", "Bongaigaon", "Dhubri", "Diphu", "North Lakhimpur", "Karimganj", "Sibsagar", "Goalpara", "Barpeta", "Lanka", "Hojai", "London", "Paris", "New York", "Tokyo", "Dubai", "Singapore", "Berlin", "Rome", "Madrid", "Moscow", "Toronto", "Sydney", "Melbourne", "Beijing", "Shanghai", "Hong Kong", "Bangkok", "Seoul", "Istanbul", "Cairo", "Rio", "Lima", "Nairobi", "Lagos", "Accra", "Dakar", "Chicago", "Houston", "Phoenix", "Philadelphia", "Dallas", "Austin", "Boston", "Seattle", "Denver", "Miami", "Atlanta", "Detroit", "Minneapolis", "Tampa", "Orlando", "Portland", "Vegas"
+        ];
+
+        // --- 1. CONFIG & STATE ---
+        const GHOST_TIMEOUT_MS = 60000;   // 60s Drift
+        const WARNING_TIMEOUT_MS = 45000; // 45s Warning
+
+        let ghostTimer = null;
+        let warningTimer = null;
+        let isGhostMode = false;
+        
+        let turnCount = 0;
+        let currentRate = 0.95; // Start nearly normal
+        
+        let recognition;
+        let audioCtx, soundNode;
+        let isSoundOn = false;
+        const synth = window.speechSynthesis;
+        
+        let usedWords = new Set();
+        let lastLetter = "";
+        let isSessionActive = false;
+
+        // --- 2. VISUALS ---
         function createStars() {
-            const layers = document.querySelectorAll('.star-layer');
-            layers.forEach((layer, layerIndex) => {
-                const numStars = (layerIndex + 1) * 150; // More stars on faster layers
-                for (let i = 0; i < numStars; i++) {
-                    const star = document.createElement('div');
-                    star.className = 'star';
-                    const size = Math.random() * (2.5 - (layerIndex * 0.5));
-                    star.style.width = `${size}px`;
-                    star.style.height = `${size}px`;
-                    star.style.left = `${Math.random() * 100}%`;
-                    star.style.top = `${Math.random() * 120 - 20}%`; // Start some off-screen
-                    star.style.opacity = Math.random() * 0.8 + 0.2;
-                    layer.appendChild(star);
-                }
-            });
+            const container = document.getElementById('stars-container');
+            for(let i=0; i<120; i++) {
+                const s = document.createElement('div');
+                s.className = 'star';
+                const size = Math.random() * 2;
+                s.style.width = size + 'px';
+                s.style.height = size + 'px';
+                s.style.left = Math.random() * 100 + '%';
+                s.style.top = Math.random() * 100 + '%';
+                s.style.opacity = Math.random() * 0.4 + 0.1;
+                
+                const duration = Math.random() * 100 + 100;
+                s.style.transition = `transform ${duration}s linear`;
+                setTimeout(() => { s.style.transform = `translateY(-100px)`; }, 100);
+                
+                container.appendChild(s);
+            }
         }
         createStars();
 
-        // --- SLEEP ENGINE ---
-
-        
-
-        const SLEEP_TIMEOUT_MS = 10 * 60 * 1000; // 10 Minutes
-
-        const FILLERS = ["Hmm... ", "Let me see... ", "Okay... ", "Right... ", "Thinking... ", "Ah... ", "Good one... ", ""];
-
-        let usedWords = new Set();
-        let lastLetter = null;
-        let voices = []; // Global array to store voices
-        let recognition;
-        let sleepTimer;
-        let audioCtx;
-        let soundNode;
-        let isSoundOn = false;
-        const synth = window.speechSynthesis;
-
-        // --- 1. VOICE SETUP ---
-
-        // Helper to ensure voices are loaded
-        function getVoicesAsync() {
-            return new Promise(resolve => {
-                let v = synth.getVoices();
-                if (v.length) {
-                    resolve(v);
-                } else {
-                    synth.onvoiceschanged = () => {
-                        v = synth.getVoices();
-                        resolve(v);
-                    };
-                }
-            });
-        }
-
-        async function loadVoices() {
-            voices = await getVoicesAsync();
-            const select = document.getElementById('voiceSelect');
-            let savedVoiceName = localStorage.getItem('selectedVoice');
-            select.innerHTML = '';
-            console.log(`Found ${voices.length} voices.`);
-
-            voices.sort((a, b) => {
-                const aScore = (a.name.includes("Google") ? 2 : 0) + (a.lang.includes("IN") ? 1 : 0);
-                const bScore = (b.name.includes("Google") ? 2 : 0) + (b.lang.includes("IN") ? 1 : 0);
-                return bScore - aScore;
-            });
-
-            let savedVoiceExists = false;
-            voices.forEach((voice) => {
-                const option = document.createElement('option');
-                option.textContent = `${voice.name} (${voice.lang})`;
-                option.value = voice.name;
-                if (voice.name === savedVoiceName) {
-                    option.selected = true;
-                    savedVoiceExists = true;
-                }
-                select.appendChild(option);
-            });
-
-            // If no saved voice or saved voice no longer exists, set a default
-            if (!savedVoiceExists && voices.length > 0) {
-                 localStorage.setItem('selectedVoice', voices[0].name);
-                 select.value = voices[0].name;
-            } else if (savedVoiceExists) {
-                select.value = savedVoiceName;
-            }
-        }
-
-        // Initial voice loading
-        loadVoices(); 
-
-        // onvoiceschanged listener for when voices become available later
-        if (speechSynthesis.onvoiceschanged !== undefined) {
-            speechSynthesis.onvoiceschanged = loadVoices;
-        }
-
-        async function testVoice() {
-            synth.cancel(); // Stop any current speech
-            const name = document.getElementById('voiceSelect').value;
-            localStorage.setItem('selectedVoice', name);
-            await loadVoices(); // Reload voices to ensure the dropdown value is reflected
-            speak("Is this soothing enough?", false);
-        }
-
-        function speak(text, callback) {
-            synth.cancel(); // Crucial: Stop any ongoing speech before starting a new one
-            resetSleepTimer();
-            document.getElementById('core').className = 'speaking';
-            document.getElementById('status').innerText = text;
-
-            const u = new SpeechSynthesisUtterance(text);
-            
-            const selectedVoiceName = localStorage.getItem('selectedVoice');
-            const selectedVoice = voices.find(v => v.name === selectedVoiceName);
-
-            if (selectedVoice) {
-                u.voice = selectedVoice;
-                console.log(`Using voice: ${selectedVoice.name} (Lang: ${selectedVoice.lang})`);
-            } else {
-                console.warn(`Selected voice '${selectedVoiceName}' not found. Using default voice.`);
-            }
-
-            u.rate = 0.8;
-            u.pitch = 0.85;
-            u.onend = () => {
-                document.getElementById('core').className = '';
-                if (callback) callback();
-            };
-            synth.speak(u);
-        }
-
-        // --- 2. AMBIENT SOUND ENGINE ---
-        
-        function createAndStartSoundNode(soundType) {
-            if (!audioCtx || soundType === 'none') return;
-
-            // Stop any existing node
-            if (soundNode) {
-                soundNode.stop();
-                soundNode.disconnect();
-            }
-
+        // --- 3. AUDIO ENGINE ---
+        function createNoise(type) {
+            if (!audioCtx) return;
             const bufferSize = audioCtx.sampleRate * 2;
             const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
             const data = buffer.getChannelData(0);
 
-            // Noise generation algorithms
-            if (soundType === 'rain') { // Brown Noise
+            if (type === 'rain' || type === 'brown') {
                 let lastOut = 0;
                 for (let i = 0; i < bufferSize; i++) {
                     const white = Math.random() * 2 - 1;
-                    lastOut = (lastOut + (0.02 * white)) / 1.02;
-                    data[i] = lastOut * 3.5;
-                }
-            } else if (soundType === 'white') { // White Noise
-                for (let i = 0; i < bufferSize; i++) {
-                    data[i] = (Math.random() * 2 - 1) * 0.4;
-                }
-            } else if (soundType === 'pink') { // Pink Noise
-                let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-                for (let i = 0; i < bufferSize; i++) {
-                    const white = Math.random() * 2 - 1;
-                    b0 = 0.99886 * b0 + white * 0.0555179;
-                    b1 = 0.99332 * b1 + white * 0.0750759;
-                    b2 = 0.96900 * b2 + white * 0.1538520;
-                    b3 = 0.86650 * b3 + white * 0.3104856;
-                    b4 = 0.55000 * b4 + white * 0.5329522;
-                    b5 = -0.7616 * b5 - white * 0.0168980;
-                    data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
-                    b6 = white * 0.115926;
+                    data[i] = (lastOut + (0.02 * white)) / 1.02;
+                    lastOut = data[i];
+                    data[i] *= 3.5; 
                 }
             }
-            
-            soundNode = audioCtx.createBufferSource();
-            soundNode.buffer = buffer;
-            soundNode.loop = true;
-
-            if (soundType === 'rain') {
-                const filter = audioCtx.createBiquadFilter();
-                filter.type = 'lowpass';
-                filter.frequency.value = 400;
-                soundNode.connect(filter);
-                filter.connect(audioCtx.destination);
-            } else {
-                soundNode.connect(audioCtx.destination);
-            }
-            
-            soundNode.start(0);
-        }
-
-        function soundChanged() {
-            const soundType = document.getElementById('soundSelect').value;
-            if (isSoundOn) {
-                if (soundType === 'none') {
-                    // If user selects "No Sound" while a sound is playing, turn it off
-                    isSoundOn = false;
-                    document.getElementById('soundBtn').innerText = "Turn On";
-                    if (audioCtx) audioCtx.suspend();
-                    if (soundNode) {
-                        soundNode.stop();
-                        soundNode.disconnect();
-                        soundNode = null;
-                    }
-                } else {
-                    // If a sound is already playing, just switch to the new one
-                    createAndStartSoundNode(soundType);
-                }
-            }
+            return buffer;
         }
 
         function toggleSound() {
-            const soundType = document.getElementById('soundSelect').value;
             const btn = document.getElementById('soundBtn');
+            if (!isSoundOn) {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!audioCtx) audioCtx = new AudioContext();
+                audioCtx.resume();
+                soundChanged();
+                btn.innerText = "Sound: On";
+                isSoundOn = true;
+            } else {
+                if (audioCtx) audioCtx.suspend();
+                btn.innerText = "Sound: Off";
+                isSoundOn = false;
+            }
+        }
 
-            if (!isSoundOn && soundType === 'none') {
-                return; // Do nothing if trying to turn on "No Sound"
+        function soundChanged() {
+            if (!isSoundOn || !audioCtx) return;
+            if (soundNode) { try{soundNode.stop();}catch(e){} }
+            
+            const type = document.getElementById('soundSelect').value;
+            if (type === 'none') return;
+
+            const buffer = createNoise(type);
+            soundNode = audioCtx.createBufferSource();
+            soundNode.buffer = buffer;
+            soundNode.loop = true;
+            
+            const filter = audioCtx.createBiquadFilter();
+            filter.type = 'lowpass';
+            filter.frequency.value = 250; 
+            
+            soundNode.connect(filter);
+            filter.connect(audioCtx.destination);
+            soundNode.start();
+        }
+
+        // --- 4. VOICE ENGINE ---
+        function getVoiceScore(voice) {
+            let score = 0;
+            const name = voice.name;
+            if (name.includes("Natural") && name.includes("Online")) score += 20; 
+            if (name.includes("Natural")) score += 15;
+            if (name.includes("Google") && name.includes("US")) score += 10;
+            if (name.includes("Siri")) score += 10;
+            if (voice.lang === 'en-US') score += 5;
+            return score;
+        }
+
+        async function loadVoices() {
+            return new Promise(resolve => {
+                let v = synth.getVoices();
+                if(v.length) resolve(v);
+                else synth.onvoiceschanged = () => resolve(synth.getVoices());
+            });
+        }
+
+        async function initVoices() {
+            const voices = await loadVoices();
+            const select = document.getElementById('voiceSelect');
+            select.innerHTML = '';
+            
+            const validVoices = voices.filter(v => v.lang.includes('en'));
+            validVoices.sort((a, b) => getVoiceScore(b) - getVoiceScore(a));
+
+            if (validVoices.length === 0) {
+                const opt = document.createElement('option');
+                opt.text = "Default Voice";
+                select.appendChild(opt);
+                return;
+            }
+
+            validVoices.forEach(v => {
+                const opt = document.createElement('option');
+                opt.value = v.name;
+                let label = v.name;
+                if (getVoiceScore(v) >= 10) label = "⭐ " + label;
+                opt.text = label;
+                select.appendChild(opt);
+            });
+            select.selectedIndex = 0;
+        }
+        initVoices();
+
+        function speak(text, callback) {
+            if (!isSessionActive && !text.includes("Voice")) return;
+            synth.cancel();
+            
+            const u = new SpeechSynthesisUtterance(text);
+            const voiceName = document.getElementById('voiceSelect').value;
+            const voice = synth.getVoices().find(v => v.name === voiceName);
+            if(voice) u.voice = voice;
+
+            const isNatural = voiceName.includes("Natural") || voiceName.includes("Google");
+
+            // HYPNOTIC VOICE MODULATION
+            if (isNatural) {
+                // Natural voices sound best when slowed down naturally
+                u.rate = Math.max(0.75, currentRate); 
+                u.pitch = 1.0; 
+            } else {
+                // Robotic voices get deeper and slower
+                u.rate = Math.max(0.65, currentRate); 
+                u.pitch = Math.max(0.8, 1.0 - (turnCount * 0.02)); 
+            }
+            u.volume = 0.8;
+
+            document.getElementById('core').className = 'speaking';
+            u.onend = () => {
+                document.getElementById('core').className = '';
+                if(callback) callback();
+            };
+            synth.speak(u);
+        }
+
+        function testVoice() {
+            synth.cancel();
+            const u = new SpeechSynthesisUtterance("Hypnotic Voice Engine Ready.");
+            const voiceName = document.getElementById('voiceSelect').value;
+            const voice = synth.getVoices().find(v => v.name === voiceName);
+            if(voice) u.voice = voice;
+            synth.speak(u);
+        }
+
+        // --- 5. GAME LOGIC & HYPNOTIC DELAYS ---
+        
+        function calculateHypnoticDelay() {
+            // Base delay 1.5s
+            // Adds 0.5s every turn
+            // Caps at 5s
+            const delay = 1500 + (turnCount * 500);
+            return Math.min(delay, 5000);
+        }
+
+        function startSession() {
+            document.getElementById('setupPanel').classList.add('hidden');
+            isSessionActive = true;
+            turnCount = 0;
+            currentRate = 0.95;
+            
+            if ('wakeLock' in navigator) {
+                try { navigator.wakeLock.request('screen'); } catch(e){}
+            }
+
+            const SR = window.SpeechRecognition || window.webkitSpeechRecognition;
+            if (SR) {
+                recognition = new SR();
+                recognition.continuous = false;
+                recognition.lang = 'en-US';
+                recognition.onresult = handleUserSpeech;
+                recognition.onerror = (e) => { 
+                    console.log("Mic Error/Silence", e); 
+                    if(!isGhostMode) restartListening(); 
+                };
+            } else {
+                alert("Speech Recognition not supported.");
             }
             
-            isSoundOn = !isSoundOn;
-
-            if (isSoundOn) {
-                // Turning ON
-                if (!audioCtx) {
-                    const AudioContext = window.AudioContext || window.webkitAudioContext;
-                    audioCtx = new AudioContext();
-                }
-                createAndStartSoundNode(soundType);
-                audioCtx.resume();
-                btn.innerText = "Turn Off";
-            } else {
-                // Turning OFF
-                if (audioCtx) audioCtx.suspend();
-                btn.innerText = "Turn On";
-            }
-        }
-
-        // --- 3. SILENT KILL TIMER ---
-        function resetSleepTimer() {
-            clearTimeout(sleepTimer);
-            sleepTimer = setTimeout(enterDeepSleep, SLEEP_TIMEOUT_MS);
-        }
-
-        function enterDeepSleep() {
-            if (recognition) {
-                recognition.onresult = null;
-                recognition.onerror = null;
-                recognition.onend = null;
-                try { recognition.stop(); } catch(e){}
-            }
-            synth.cancel(); // Stop any current speech
-            if (audioCtx) audioCtx.close();
-            document.body.style.backgroundColor = "#000";
-            document.getElementById('core').style.display = 'none';
-            document.getElementById('status').innerText = "";
-        }
-
-        // --- 4. GAME LOGIC ---
-        async function initGame() {
-            await loadVoices(); // Explicitly load voices on user action and await completion
-            document.getElementById('setupPanel').classList.add('hidden');
-            try { navigator.wakeLock.request('screen'); } catch(e){}
-            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-            recognition = new SpeechRecognition();
-
-            recognition.lang = "en-IN";
-
-            recognition.onresult = (event) => {
-
-                const heard = event.results[0][0].transcript.trim().replace(".","");
-
-                document.getElementById('status').innerText = `You: ${heard}`;
-
-                resetSleepTimer();
-
-                processMove(heard);
-
-            };
-
-            recognition.onend = () => {
-
-                if (document.getElementById('core').className === 'listening') {
-
-                    try { recognition.start(); } catch(e){}
-
-                }
-
-            };
-
-            resetSleepTimer();
-
-            speak("Close your eyes. Relax. I will start. Mumbai.", () => {
-
-                usedWords.add("Mumbai");
-
-                lastLetter = "i";
-
-                listen();
-
+            speak("Close your eyes. Relax... I will start. Chicago.", () => {
+                usedWords.add("Chicago");
+                lastLetter = "o";
+                startTurn();
             });
-
         }
 
-    
+        function startTurn() {
+            if (!isSessionActive) return;
+
+            // RESET TIMERS
+            clearTimeout(ghostTimer);
+            clearTimeout(warningTimer);
+
+            if (!isGhostMode) {
+                // Warning at 45s (Soft)
+                warningTimer = setTimeout(() => {
+                    if(!isGhostMode && isSessionActive) {
+                        speak("Are you still with me? ...", restartListening);
+                    }
+                }, WARNING_TIMEOUT_MS);
+
+                // Drift at 60s
+                ghostTimer = setTimeout(enterGhostMode, GHOST_TIMEOUT_MS);
+                
+                listen();
+            } else {
+                aiSelfPlay();
+            }
+        }
 
         function listen() {
-
             document.getElementById('core').className = 'listening';
-
             document.getElementById('status').innerText = "Listening...";
-
-            try { recognition.start(); } catch(e){}
-
+            try { recognition.start(); } catch(e) {}
         }
 
-    
+        function restartListening() {
+            if (isSessionActive && !isGhostMode) {
+                setTimeout(() => { 
+                    try { recognition.start(); } catch(e){} 
+                }, 500);
+            }
+        }
 
-        function processMove(rawWord) {
+        function handleUserSpeech(event) {
+            clearTimeout(ghostTimer); 
+            clearTimeout(warningTimer);
+            
+            const transcript = event.results[0][0].transcript.trim().replace(".","");
+            document.getElementById('status').innerText = transcript;
+            
+            if (transcript.toLowerCase() === "stop") {
+                endSession();
+                return;
+            }
 
-            const city = rawWord.split(" ")[0]; 
+            const city = transcript.split(" ")[0]; 
+            
+            if (!validateMove(city)) {
+                speak(`Try a place starting with ${lastLetter}.`, listen);
+                return;
+            }
 
+            processValidMove(city);
+        }
+
+        function validateMove(rawCity) {
+            if (!rawCity) return false;
+            return rawCity.toLowerCase().startsWith(lastLetter.toLowerCase());
+        }
+
+        function processValidMove(city) {
             const cleanCity = city.charAt(0).toUpperCase() + city.slice(1).toLowerCase();
-
-            if (!CITIES_DB.includes(cleanCity)) {
-
-                speak(`Hmm... let's try a word with ${lastLetter}.`, listen);
-
-                return;
-
-            }
-
-            if (usedWords.has(cleanCity) || cleanCity.toLowerCase().charAt(0) !== lastLetter.toLowerCase()) {
-
-                speak(`Try another one with ${lastLetter}.`, listen);
-
-                return;
-
-            }
-
             usedWords.add(cleanCity);
-
             const nextChar = cleanCity.slice(-1);
+            
+            turnCount++;
+            
+            // HYPNOTIC DECELERATION: Drop speed every 3 turns
+            if (turnCount % 3 === 0) currentRate -= 0.05; 
 
-            setTimeout(() => botReply(nextChar), Math.random() * 2000 + 2000);
-
+            // HYPNOTIC DELAY: Pause longer as game progresses
+            const delay = calculateHypnoticDelay();
+            
+            setTimeout(() => aiReply(nextChar), delay);
         }
 
-    
-
-        function botReply(char) {
-
+        function aiReply(char) {
             const candidates = CITIES_DB.filter(c => c.toLowerCase().startsWith(char.toLowerCase()) && !usedWords.has(c));
-
+            
             if (candidates.length === 0) {
-
-                enterDeepSleep(); // End silently if stuck
-
+                // Fallback to random if stuck
+                const fallback = CITIES_DB.filter(c => !usedWords.has(c));
+                const choice = fallback[Math.floor(Math.random() * fallback.length)];
+                speak(`I'll switch to ${choice}. Your turn with ${choice.slice(-1)}.`, startTurn);
+                usedWords.add(choice);
+                lastLetter = choice.slice(-1);
                 return;
-
             }
 
             const choice = candidates[Math.floor(Math.random() * candidates.length)];
-
             usedWords.add(choice);
-
             lastLetter = choice.slice(-1);
-
-            let prefix = Math.random() > 0.6 ? FILLERS[Math.floor(Math.random() * FILLERS.length)] : "";
-
-            speak(`${prefix} ${choice}. Your turn with ${lastLetter}.`, listen);
-
+            
+            if (isGhostMode) {
+                speak(choice, startTurn); 
+            } else {
+                speak(`${choice}. Your turn with ${lastLetter}.`, startTurn);
+            }
         }
 
+        // --- 6. GHOST MODE (Drifting) ---
+        function enterGhostMode() {
+            if (isGhostMode) return;
+            isGhostMode = true;
+            document.getElementById('status').innerText = "Drifting...";
+            document.getElementById('status').style.opacity = 0.5;
+            
+            try { recognition.stop(); } catch(e){}
+
+            speak("Drifting off... I will continue...", () => {
+                aiSelfPlay();
+            });
+        }
+
+        function aiSelfPlay() {
+            if(!isSessionActive) return;
+            
+            // In Ghost Mode, the delay is fixed and long (6 seconds)
+            // This acts like a rhythmic metronome
+            setTimeout(() => {
+                const candidates = CITIES_DB.filter(c => c.toLowerCase().startsWith(lastLetter.toLowerCase()) && !usedWords.has(c));
+                if(candidates.length > 0) {
+                    const choice = candidates[Math.floor(Math.random() * candidates.length)];
+                    usedWords.add(choice);
+                    lastLetter = choice.slice(-1);
+                    
+                    document.getElementById('status').innerText = choice;
+                    speak(choice, () => {
+                        setTimeout(() => aiReply(lastLetter), 2000); 
+                    });
+                }
+            }, 6000); 
+        }
+
+        function endSession() {
+            isSessionActive = false;
+            synth.cancel();
+            if(audioCtx) audioCtx.close();
+            document.body.innerHTML = ""; 
+            document.body.style.backgroundColor = "#000";
+        }
     </script>
 </body>
 </html>
