@@ -225,781 +225,222 @@
 
         const FILLERS = ["Hmm... ", "Let me see... ", "Okay... ", "Right... ", "Thinking... ", "Ah... ", "Good one... ", ""];
 
-    
-
-                let usedWords = new Set();
-
-    
-
-                let lastLetter = null;
-
-    
-
-                let voices = [];
-
-    
-
-                let recognition;
-
-    
-
-                let sleepTimer;
-
-    
-
-                let audioCtx;
-
-    
-
-                let soundNode;
-
-    
-
-                let isSoundOn = false;
-
-    
-
-                const synth = window.speechSynthesis;
-
-    
-
-        
-
-    
-
-                // --- 1. VOICE SETUP ---
-
-    
-
-                function loadVoices() {
-
-    
-
-                    voices = synth.getVoices();
-
-    
-
-                    const select = document.getElementById('voiceSelect');
-
-    
-
-                    const savedVoiceName = localStorage.getItem('selectedVoice');
-
-    
-
-                    select.innerHTML = '';
-
-    
-
-                    console.log(`Found ${voices.length} voices.`);
-
-    
-
-        
-
-    
-
-                    voices.sort((a, b) => {
-
-    
-
-                        const aScore = (a.name.includes("Google") ? 2 : 0) + (a.lang.includes("IN") ? 1 : 0);
-
-    
-
-                        const bScore = (b.name.includes("Google") ? 2 : 0) + (b.lang.includes("IN") ? 1 : 0);
-
-    
-
-                        return bScore - aScore;
-
-    
-
-                    });
-
-    
-
-        
-
-    
-
-                    let savedVoiceExists = false;
-
-    
-
-                    voices.forEach((voice) => {
-
-    
-
-                        const option = document.createElement('option');
-
-    
-
-                        option.textContent = `${voice.name} (${voice.lang})`;
-
-    
-
-                        option.value = voice.name;
-
-    
-
-                        if (voice.name === savedVoiceName) {
-
-    
-
-                            option.selected = true;
-
-    
-
-                            savedVoiceExists = true;
-
-    
-
-                        }
-
-    
-
-                        select.appendChild(option);
-
-    
-
-                    });
-
-    
-
-        
-
-    
-
-                    if (!savedVoiceExists && voices.length > 0) {
-
-    
-
-                         localStorage.setItem('selectedVoice', voices[0].name);
-
-    
-
-                    }
-
-    
-
-                }
-
-    
-
-        
-
-    
-
-                loadVoices();
-
-    
-
-                if (speechSynthesis.onvoiceschanged !== undefined) {
-
-    
-
-                    speechSynthesis.onvoiceschanged = loadVoices;
-
-    
-
-                }
-
-    
-
-        
-
-    
-
-                function testVoice() {
-
-    
-
-                    const name = document.getElementById('voiceSelect').value;
-
-    
-
-                    localStorage.setItem('selectedVoice', name);
-
-    
-
-                    speak("Is this soothing enough?", false);
-
-    
-
-                }
-
-    
-
-        
-
-    
-
-                function speak(text, callback) {
-
-    
-
-                    resetSleepTimer();
-
-    
-
-                    document.getElementById('core').className = 'speaking';
-
-    
-
-                    document.getElementById('status').innerText = text;
-
-    
-
-        
-
-    
-
-                    const u = new SpeechSynthesisUtterance(text);
-
-    
-
-                    
-
-    
-
-                    // Just-in-time voice selection for robustness
-
-    
-
-                    if (voices.length === 0) {
-
-    
-
-                        voices = synth.getVoices(); // Try fetching again
-
-    
-
-                    }
-
-    
-
-                    const selectedVoiceName = localStorage.getItem('selectedVoice');
-
-    
-
-                    const selectedVoice = voices.find(v => v.name === selectedVoiceName);
-
-    
-
-        
-
-    
-
-                    if (selectedVoice) {
-
-    
-
-                        u.voice = selectedVoice;
-
-    
-
-                        console.log(`Using voice: ${selectedVoice.name}`);
-
-    
-
-                    } else {
-
-    
-
-                        console.log("Selected voice not found, using default.");
-
-    
-
-                    }
-
-    
-
-        
-
-    
-
-                    u.rate = 0.8;
-
-    
-
-                    u.pitch = 0.85;
-
-    
-
-                    u.onend = () => {
-
-    
-
-                        document.getElementById('core').className = '';
-
-    
-
-                        if (callback) callback();
-
-    
-
+        let usedWords = new Set();
+        let lastLetter = null;
+        let voices = []; // Global array to store voices
+        let recognition;
+        let sleepTimer;
+        let audioCtx;
+        let soundNode;
+        let isSoundOn = false;
+        const synth = window.speechSynthesis;
+
+        // --- 1. VOICE SETUP ---
+
+        // Helper to ensure voices are loaded
+        function getVoicesAsync() {
+            return new Promise(resolve => {
+                let v = synth.getVoices();
+                if (v.length) {
+                    resolve(v);
+                } else {
+                    synth.onvoiceschanged = () => {
+                        v = synth.getVoices();
+                        resolve(v);
                     };
-
-    
-
-                    synth.speak(u);
-
-    
-
                 }
+            });
+        }
 
-    
+        async function loadVoices() {
+            voices = await getVoicesAsync();
+            const select = document.getElementById('voiceSelect');
+            let savedVoiceName = localStorage.getItem('selectedVoice');
+            select.innerHTML = '';
+            console.log(`Found ${voices.length} voices.`);
 
-        
+            voices.sort((a, b) => {
+                const aScore = (a.name.includes("Google") ? 2 : 0) + (a.lang.includes("IN") ? 1 : 0);
+                const bScore = (b.name.includes("Google") ? 2 : 0) + (b.lang.includes("IN") ? 1 : 0);
+                return bScore - aScore;
+            });
 
-    
-
-                // --- 2. AMBIENT SOUND ENGINE ---
-
-    
-
-                function soundChanged() {
-
-    
-
-                    if (isSoundOn) {
-
-    
-
-                        if (soundNode) soundNode.disconnect();
-
-    
-
-                        initAudio();
-
-    
-
-                        audioCtx.resume();
-
-    
-
-                    }
-
-    
-
+            let savedVoiceExists = false;
+            voices.forEach((voice) => {
+                const option = document.createElement('option');
+                option.textContent = `${voice.name} (${voice.lang})`;
+                option.value = voice.name;
+                if (voice.name === savedVoiceName) {
+                    option.selected = true;
+                    savedVoiceExists = true;
                 }
+                select.appendChild(option);
+            });
 
-    
+            // If no saved voice or saved voice no longer exists, set a default
+            if (!savedVoiceExists && voices.length > 0) {
+                 localStorage.setItem('selectedVoice', voices[0].name);
+                 select.value = voices[0].name;
+            } else if (savedVoiceExists) {
+                select.value = savedVoiceName;
+            }
+        }
 
-        
+        // Initial voice loading
+        loadVoices(); 
 
-    
+        // onvoiceschanged listener for when voices become available later
+        if (speechSynthesis.onvoiceschanged !== undefined) {
+            speechSynthesis.onvoiceschanged = loadVoices;
+        }
 
-                function toggleSound() {
+        async function testVoice() {
+            synth.cancel(); // Stop any current speech
+            const name = document.getElementById('voiceSelect').value;
+            localStorage.setItem('selectedVoice', name);
+            await loadVoices(); // Reload voices to ensure the dropdown value is reflected
+            speak("Is this soothing enough?", false);
+        }
 
-    
+        function speak(text, callback) {
+            synth.cancel(); // Crucial: Stop any ongoing speech before starting a new one
+            resetSleepTimer();
+            document.getElementById('core').className = 'speaking';
+            document.getElementById('status').innerText = text;
 
-                    const sound = document.getElementById('soundSelect').value;
+            const u = new SpeechSynthesisUtterance(text);
+            
+            const selectedVoiceName = localStorage.getItem('selectedVoice');
+            const selectedVoice = voices.find(v => v.name === selectedVoiceName);
 
-    
+            if (selectedVoice) {
+                u.voice = selectedVoice;
+                console.log(`Using voice: ${selectedVoice.name} (Lang: ${selectedVoice.lang})`);
+            } else {
+                console.warn(`Selected voice '${selectedVoiceName}' not found. Using default voice.`);
+            }
 
-                    if (sound === 'none') return;
+            u.rate = 0.8;
+            u.pitch = 0.85;
+            u.onend = () => {
+                document.getElementById('core').className = '';
+                if (callback) callback();
+            };
+            synth.speak(u);
+        }
 
-    
+        // --- 2. AMBIENT SOUND ENGINE ---
+        function soundChanged() {
+            if (isSoundOn) {
+                if (soundNode) soundNode.disconnect();
+                initAudio();
+                audioCtx.resume();
+            }
+        }
 
-        
+        function toggleSound() {
+            const sound = document.getElementById('soundSelect').value;
+            if (sound === 'none') return;
 
-    
+            if (isSoundOn) {
+                if (audioCtx) audioCtx.suspend();
+                document.getElementById('soundBtn').innerText = "Turn On";
+                isSoundOn = false;
+            } else {
+                if (!audioCtx) initAudio();
+                audioCtx.resume();
+                document.getElementById('soundBtn').innerText = "Turn Off";
+                isSoundOn = true;
+            }
+        }
 
-                    if (isSoundOn) {
+        function initAudio() {
+            if (audioCtx) {
+                audioCtx.close();
+            }
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+            audioCtx = new AudioContext();
 
-    
+            const soundType = document.getElementById('soundSelect').value;
+            if (soundType === 'none') return;
 
-                        if (audioCtx) audioCtx.suspend();
+            const bufferSize = audioCtx.sampleRate * 2;
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+            const data = buffer.getChannelData(0);
 
-    
-
-                        document.getElementById('soundBtn').innerText = "Turn On";
-
-    
-
-                        isSoundOn = false;
-
-    
-
-                    } else {
-
-    
-
-                        if (!audioCtx) initAudio();
-
-    
-
-                        audioCtx.resume();
-
-    
-
-                        document.getElementById('soundBtn').innerText = "Turn Off";
-
-    
-
-                        isSoundOn = true;
-
-    
-
-                    }
-
-    
-
+            // Noise generation
+            if (soundType === 'rain') { // Brown Noise
+                let lastOut = 0;
+                for (let i = 0; i < bufferSize; i++) {
+                    const white = Math.random() * 2 - 1;
+                    lastOut = (lastOut + (0.02 * white)) / 1.02;
+                    data[i] = lastOut * 3.5;
                 }
-
-    
-
-        
-
-    
-
-                function initAudio() {
-
-    
-
-                    if (audioCtx) {
-
-    
-
-                        audioCtx.close();
-
-    
-
-                    }
-
-    
-
-                    const AudioContext = window.AudioContext || window.webkitAudioContext;
-
-    
-
-                    audioCtx = new AudioContext();
-
-    
-
-        
-
-    
-
-                    const soundType = document.getElementById('soundSelect').value;
-
-    
-
-                    if (soundType === 'none') return;
-
-    
-
-        
-
-    
-
-                    const bufferSize = audioCtx.sampleRate * 2;
-
-    
-
-                    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-
-    
-
-                    const data = buffer.getChannelData(0);
-
-    
-
-        
-
-    
-
-                    // Noise generation
-
-    
-
-                    if (soundType === 'rain') { // Brown Noise
-
-    
-
-                        let lastOut = 0;
-
-    
-
-                        for (let i = 0; i < bufferSize; i++) {
-
-    
-
-                            const white = Math.random() * 2 - 1;
-
-    
-
-                            lastOut = (lastOut + (0.02 * white)) / 1.02;
-
-    
-
-                            data[i] = lastOut * 3.5;
-
-    
-
-                        }
-
-    
-
-                    } else if (soundType === 'white') { // White Noise
-
-    
-
-                        for (let i = 0; i < bufferSize; i++) {
-
-    
-
-                            data[i] = (Math.random() * 2 - 1) * 0.4;
-
-    
-
-                        }
-
-    
-
-                    } else if (soundType === 'pink') { // Pink Noise
-
-    
-
-                        let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
-
-    
-
-                        for (let i = 0; i < bufferSize; i++) {
-
-    
-
-                            const white = Math.random() * 2 - 1;
-
-    
-
-                            b0 = 0.99886 * b0 + white * 0.0555179;
-
-    
-
-                            b1 = 0.99332 * b1 + white * 0.0750759;
-
-    
-
-                            b2 = 0.96900 * b2 + white * 0.1538520;
-
-    
-
-                            b3 = 0.86650 * b3 + white * 0.3104856;
-
-    
-
-                            b4 = 0.55000 * b4 + white * 0.5329522;
-
-    
-
-                            b5 = -0.7616 * b5 - white * 0.0168980;
-
-    
-
-                            data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
-
-    
-
-                            b6 = white * 0.115926;
-
-    
-
-                        }
-
-    
-
-                    }
-
-    
-
-        
-
-    
-
-                    soundNode = audioCtx.createBufferSource();
-
-    
-
-                    soundNode.buffer = buffer;
-
-    
-
-                    soundNode.loop = true;
-
-    
-
-        
-
-    
-
-                    // Filtering for rain sound
-
-    
-
-                    if (soundType === 'rain') {
-
-    
-
-                        const filter = audioCtx.createBiquadFilter();
-
-    
-
-                        filter.type = 'lowpass';
-
-    
-
-                        filter.frequency.value = 400;
-
-    
-
-                        soundNode.connect(filter);
-
-    
-
-                        filter.connect(audioCtx.destination);
-
-    
-
-                    } else {
-
-    
-
-                        soundNode.connect(audioCtx.destination);
-
-    
-
-                    }
-
-    
-
-                    
-
-    
-
-                    soundNode.start(0);
-
-    
-
-                    audioCtx.suspend(); // Start suspended
-
-    
-
+            } else if (soundType === 'white') { // White Noise
+                for (let i = 0; i < bufferSize; i++) {
+                    data[i] = (Math.random() * 2 - 1) * 0.4;
                 }
-
-    
-
-        
-
-    
-
-                // --- 3. SILENT KILL TIMER ---
-
-    
-
-                function resetSleepTimer() {
-
-    
-
-                    clearTimeout(sleepTimer);
-
-    
-
-                    sleepTimer = setTimeout(enterDeepSleep, SLEEP_TIMEOUT_MS);
-
-    
-
+            } else if (soundType === 'pink') { // Pink Noise
+                let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+                for (let i = 0; i < bufferSize; i++) {
+                    const white = Math.random() * 2 - 1;
+                    b0 = 0.99886 * b0 + white * 0.0555179;
+                    b1 = 0.99332 * b1 + white * 0.0750759;
+                    b2 = 0.96900 * b2 + white * 0.1538520;
+                    b3 = 0.86650 * b3 + white * 0.3104856;
+                    b4 = 0.55000 * b4 + white * 0.5329522;
+                    b5 = -0.7616 * b5 - white * 0.0168980;
+                    data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+                    b6 = white * 0.115926;
                 }
+            }
 
-    
+            soundNode = audioCtx.createBufferSource();
+            soundNode.buffer = buffer;
+            soundNode.loop = true;
 
-        
+            // Filtering for rain sound
+            if (soundType === 'rain') {
+                const filter = audioCtx.createBiquadFilter();
+                filter.type = 'lowpass';
+                filter.frequency.value = 400;
+                soundNode.connect(filter);
+                filter.connect(audioCtx.destination);
+            } else {
+                soundNode.connect(audioCtx.destination);
+            }
+            
+            soundNode.start(0);
+            audioCtx.suspend(); // Start suspended
+        }
 
-    
+        // --- 3. SILENT KILL TIMER ---
+        function resetSleepTimer() {
+            clearTimeout(sleepTimer);
+            sleepTimer = setTimeout(enterDeepSleep, SLEEP_TIMEOUT_MS);
+        }
 
-                function enterDeepSleep() {
+        function enterDeepSleep() {
+            if (recognition) {
+                recognition.onresult = null;
+                recognition.onerror = null;
+                recognition.onend = null;
+                try { recognition.stop(); } catch(e){}
+            }
+            synth.cancel(); // Stop any current speech
+            if (audioCtx) audioCtx.close();
+            document.body.style.backgroundColor = "#000";
+            document.getElementById('core').style.display = 'none';
+            document.getElementById('status').innerText = "";
+        }
 
-    
-
-                    if (recognition) {
-
-    
-
-                        recognition.onresult = null;
-
-    
-
-                        recognition.onerror = null;
-
-    
-
-                        recognition.onend = null;
-
-    
-
-                        try { recognition.stop(); } catch(e){}
-
-    
-
-                    }
-
-    
-
-                    synth.cancel(); // Stop any current speech
-
-    
-
-                    if (audioCtx) audioCtx.close();
-
-    
-
-                    document.body.style.backgroundColor = "#000";
-
-    
-
-                    document.getElementById('core').style.display = 'none';
-
-    
-
-                    document.getElementById('status').innerText = "";
-
-    
-
-                }
-
-    
-
-        
-
-    
-
-                // --- 4. GAME LOGIC ---
-
-    
-
-                function initGame() {
-
-    
-
-                    loadVoices(); // Explicitly load voices on user action
-
-    
-
-                    document.getElementById('setupPanel').classList.add('hidden');
-
-    
-
-                    try { navigator.wakeLock.request('screen'); } catch(e){}
-
-    
-
-                    const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
-
-    
-
-                    recognition = new SpeechRecognition();
+        // --- 4. GAME LOGIC ---
+        async function initGame() {
+            await loadVoices(); // Explicitly load voices on user action and await completion
+            document.getElementById('setupPanel').classList.add('hidden');
+            try { navigator.wakeLock.request('screen'); } catch(e){}
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+            recognition = new SpeechRecognition();
 
             recognition.lang = "en-IN";
 
