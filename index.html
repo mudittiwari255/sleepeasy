@@ -20,33 +20,82 @@
             touch-action: manipulation;
         }
 
+        #stars-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            z-index: -1;
+        }
+
+        .star-layer {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform-style: preserve-3d;
+        }
+
+        .star-layer.layer-1 { animation: space-travel-1 180s linear infinite; }
+        .star-layer.layer-2 { animation: space-travel-2 120s linear infinite; }
+        .star-layer.layer-3 { animation: space-travel-3 60s linear infinite; }
+
+        .star {
+            position: absolute;
+            border-radius: 50%;
+            background-color: #fff;
+        }
+
+        @keyframes space-travel-1 {
+            from { transform: translateY(0px); }
+            to   { transform: translateY(-200px); }
+        }
+        @keyframes space-travel-2 {
+            from { transform: translateY(0px); }
+            to   { transform: translateY(-400px); }
+        }
+        @keyframes space-travel-3 {
+            from { transform: translateY(0px); }
+            to   { transform: translateY(-600px); }
+        }
+
         /* The Breathing Core */
         #core {
             width: 100px;
             height: 100px;
             border-radius: 50%;
-            background: #111;
-            transition: all 0.5s ease;
-            box-shadow: 0 0 10px rgba(255,255,255,0.05);
+            background: #0D0D15;
+            transition: all 1s ease;
+            box-shadow: 0 0 20px rgba(12, 12, 20, 0.8), inset 0 0 15px rgba(12, 12, 20, 0.9);
             margin-bottom: 40px;
+            z-index: 1;
         }
 
         /* States */
         .listening {
             background: #152838 !important; /* Muted Navy */
-            animation: breathe 4s infinite ease-in-out;
-            box-shadow: 0 0 40px rgba(30, 60, 90, 0.4);
+            animation: breathe 5s infinite ease-in-out;
+            box-shadow: 
+                0 0 40px rgba(30, 60, 90, 0.6),
+                0 0 80px rgba(50, 100, 150, 0.3),
+                inset 0 0 20px rgba(30, 60, 90, 0.5);
         }
         .speaking {
             background: #382815 !important; /* Muted Amber */
-            box-shadow: 0 0 30px rgba(90, 60, 30, 0.3);
+             box-shadow: 
+                0 0 35px rgba(90, 60, 30, 0.5),
+                0 0 70px rgba(140, 90, 50, 0.2),
+                inset 0 0 15px rgba(90, 60, 30, 0.4);
             transform: scale(1.05);
         }
 
         @keyframes breathe {
-            0% { transform: scale(1); opacity: 0.7; }
-            50% { transform: scale(1.2); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.7; }
+            0% { transform: scale(1); opacity: 0.8; }
+            50% { transform: scale(1.15); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.8; }
         }
 
         #status {
@@ -55,6 +104,7 @@
             color: #444;
             min-height: 24px;
             text-align: center;
+            z-index: 1;
         }
 
         /* Controls */
@@ -66,6 +116,19 @@
             gap: 15px;
             width: 80%;
             max-width: 300px;
+            z-index: 1;
+        }
+        
+        .persistent-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            opacity: 0;
+            animation: fadeIn 1s ease 0.5s forwards;
+            z-index: 1;
         }
 
         select {
@@ -92,32 +155,41 @@
         button:active { background: #333; }
         
         .hidden { display: none !important; }
+
+        @keyframes fadeIn {
+            to { opacity: 0.5; }
+        }
     </style>
 </head>
 <body>
 
+        <div id="stars-container">
+            <div class="star-layer layer-1"></div>
+            <div class="star-layer layer-2"></div>
+            <div class="star-layer layer-3"></div>
+        </div>
         <div id="core"></div>
 
         <div id="status">...</div>
 
     
+        <div class="persistent-controls">
+            <select id="soundSelect" onchange="soundChanged()">
+                <option value="none">No Sound</option>
+                <option value="rain">Rain</option>
+                <option value="white">White Noise</option>
+                <option value="pink">Pink Noise</option>
+            </select>
+            <button onclick="toggleSound()" id="soundBtn">Turn On</button>
+        </div>
 
         <div class="controls" id="setupPanel">
-
             <select id="voiceSelect" onchange="testVoice()">
-
                 <option value="">Loading voices...</option>
-
             </select>
-
             <div style="display: flex; gap: 10px;">
-
-                <button onclick="toggleRain()" id="rainBtn" style="flex:1;">Turn On Rain</button>
-
                 <button onclick="initGame()" style="flex:2;">Start Sleep Session</button>
-
             </div>
-
         </div>
 
     
@@ -125,6 +197,25 @@
     <script src="cities.js"></script>
 
     <script>
+        // --- STARFIELD ---
+        function createStars() {
+            const layers = document.querySelectorAll('.star-layer');
+            layers.forEach((layer, layerIndex) => {
+                const numStars = (layerIndex + 1) * 150; // More stars on faster layers
+                for (let i = 0; i < numStars; i++) {
+                    const star = document.createElement('div');
+                    star.className = 'star';
+                    const size = Math.random() * (2.5 - (layerIndex * 0.5));
+                    star.style.width = `${size}px`;
+                    star.style.height = `${size}px`;
+                    star.style.left = `${Math.random() * 100}%`;
+                    star.style.top = `${Math.random() * 120 - 20}%`; // Start some off-screen
+                    star.style.opacity = Math.random() * 0.8 + 0.2;
+                    layer.appendChild(star);
+                }
+            });
+        }
+        createStars();
 
         // --- SLEEP ENGINE ---
 
@@ -144,195 +235,407 @@
 
         let recognition;
 
-        let sleepTimer;
+                let sleepTimer;
 
-        let audioCtx;
+                let audioCtx;
 
-        let rainNode;
+                let soundNode;
 
-        let isRainOn = false;
+                let isSoundOn = false;
 
-        const synth = window.speechSynthesis;
+                const synth = window.speechSynthesis;
 
-    
-
-        // --- 1. VOICE SETUP ---
-
-        function loadVoices() {
-
-            const voices = synth.getVoices();
-
-            const select = document.getElementById('voiceSelect');
-
-            const savedVoice = localStorage.getItem('selectedVoice');
-
-            select.innerHTML = '';
+        
 
             
 
-            voices.sort((a, b) => {
+        
 
-                const aScore = (a.name.includes("Google") ? 2 : 0) + (a.lang.includes("IN") ? 1 : 0);
+                // --- 1. VOICE SETUP ---
 
-                const bScore = (b.name.includes("Google") ? 2 : 0) + (b.lang.includes("IN") ? 1 : 0);
+        
 
-                return bScore - aScore;
+                function loadVoices() {
 
-            });
+        
 
-    
+                    const voices = synth.getVoices();
 
-            let foundSaved = false;
+        
 
-            voices.forEach((voice) => {
+                    const select = document.getElementById('voiceSelect');
 
-                const option = document.createElement('option');
+        
 
-                option.textContent = `${voice.name} (${voice.lang})`;
+                    const savedVoice = localStorage.getItem('selectedVoice');
 
-                option.value = voice.name;
+        
 
-                if (voice.name === savedVoice) {
+                    select.innerHTML = '';
 
-                    option.selected = true;
+        
 
-                    selectedVoice = voice;
+                    
 
-                    foundSaved = true;
+        
+
+                    voices.sort((a, b) => {
+
+        
+
+                        const aScore = (a.name.includes("Google") ? 2 : 0) + (a.lang.includes("IN") ? 1 : 0);
+
+        
+
+                        const bScore = (b.name.includes("Google") ? 2 : 0) + (b.lang.includes("IN") ? 1 : 0);
+
+        
+
+                        return bScore - aScore;
+
+        
+
+                    });
+
+        
+
+            
+
+        
+
+                    let foundSaved = false;
+
+        
+
+                    voices.forEach((voice) => {
+
+        
+
+                        const option = document.createElement('option');
+
+        
+
+                        option.textContent = `${voice.name} (${voice.lang})`;
+
+        
+
+                        option.value = voice.name;
+
+        
+
+                        if (voice.name === savedVoice) {
+
+        
+
+                            option.selected = true;
+
+        
+
+                            selectedVoice = voice;
+
+        
+
+                            foundSaved = true;
+
+        
+
+                        }
+
+        
+
+                        select.appendChild(option);
+
+        
+
+                    });
+
+        
+
+                    if (!foundSaved && voices.length > 0) selectedVoice = voices[0];
+
+        
 
                 }
 
-                select.appendChild(option);
+        
 
-            });
+            
 
-            if (!foundSaved && voices.length > 0) selectedVoice = voices[0];
+        
 
-        }
+                loadVoices();
 
-    
+        
 
-        loadVoices();
+                if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadVoices;
 
-        if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadVoices;
+        
 
-    
+            
 
-        function testVoice() {
+        
 
-            const name = document.getElementById('voiceSelect').value;
+                function testVoice() {
 
-            selectedVoice = synth.getVoices().find(v => v.name === name);
+        
 
-            localStorage.setItem('selectedVoice', name);
+                    const name = document.getElementById('voiceSelect').value;
 
-            speak("Is this soothing enough?", false);
+        
 
-        }
+                    selectedVoice = synth.getVoices().find(v => v.name === name);
 
-    
+        
 
-        function speak(text, callback) {
+                    localStorage.setItem('selectedVoice', name);
 
-            resetSleepTimer(); 
+        
 
-            document.getElementById('core').className = 'speaking';
+                    speak("Is this soothing enough?", false);
 
-            document.getElementById('status').innerText = text;
+        
 
-            const u = new SpeechSynthesisUtterance(text);
+                }
 
-            if (selectedVoice) u.voice = selectedVoice;
+        
 
-            u.rate = 0.8; 
+            
 
-            u.pitch = 0.85; 
+        
 
-            u.onend = () => {
+                function speak(text, callback) {
 
-                document.getElementById('core').className = '';
+        
 
-                if (callback) callback();
+                    resetSleepTimer(); 
 
-            };
+        
 
-            synth.speak(u);
+                    document.getElementById('core').className = 'speaking';
 
-        }
+        
 
-    
+                    document.getElementById('status').innerText = text;
 
-        // --- 2. BROWN NOISE (RAIN) ---
+        
 
-        function toggleRain() {
+                    const u = new SpeechSynthesisUtterance(text);
 
-            if (isRainOn) {
+        
 
-                if (audioCtx) audioCtx.suspend();
+                    if (selectedVoice) u.voice = selectedVoice;
 
-                document.getElementById('rainBtn').innerText = "Turn On Rain";
+        
 
-                isRainOn = false;
+                    u.rate = 0.8; 
 
-            } else {
+        
 
-                if (!audioCtx) initAudio();
+                    u.pitch = 0.85; 
 
-                audioCtx.resume();
+        
 
-                document.getElementById('rainBtn').innerText = "Turn Off Rain";
+                    u.onend = () => {
 
-                isRainOn = true;
+        
 
-            }
+                        document.getElementById('core').className = '';
 
-        }
+        
 
-    
+                        if (callback) callback();
 
-        function initAudio() {
+        
 
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    };
 
-            audioCtx = new AudioContext();
+        
 
-            const bufferSize = audioCtx.sampleRate * 2;
+                    synth.speak(u);
 
-            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+        
 
-            const data = buffer.getChannelData(0);
+                }
 
-            let lastOut = 0;
+        
 
-            for (let i = 0; i < bufferSize; i++) {
+            
 
-                const white = Math.random() * 2 - 1;
+        
 
-                lastOut = (lastOut + (0.02 * white)) / 1.02;
+                // --- 2. AMBIENT SOUND ENGINE ---
 
-                data[i] = lastOut * 0.3; 
+        
 
-            }
+                function soundChanged() {
 
-            rainNode = audioCtx.createBufferSource();
+                    if (isSoundOn) {
 
-            rainNode.buffer = buffer;
+                        if (soundNode) soundNode.disconnect();
 
-            rainNode.loop = true;
+                        initAudio();
 
-            const filter = audioCtx.createBiquadFilter();
+                        audioCtx.resume();
 
-            filter.type = 'lowpass';
+                    }
 
-            filter.frequency.value = 350;
+                }
 
-            rainNode.connect(filter);
+        
 
-            filter.connect(audioCtx.destination);
+                function toggleSound() {
 
-            rainNode.start(0);
+                    const sound = document.getElementById('soundSelect').value;
 
-        }
+                    if (sound === 'none') return;
+
+        
+
+                    if (isSoundOn) {
+
+                        if (audioCtx) audioCtx.suspend();
+
+                        document.getElementById('soundBtn').innerText = "Turn On";
+
+                        isSoundOn = false;
+
+                    } else {
+
+                        if (!audioCtx) initAudio();
+
+                        audioCtx.resume();
+
+                        document.getElementById('soundBtn').innerText = "Turn Off";
+
+                        isSoundOn = true;
+
+                    }
+
+                }
+
+        
+
+            
+
+        
+
+                function initAudio() {
+
+                    if (audioCtx) {
+
+                        audioCtx.close();
+
+                    }
+
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+
+                    audioCtx = new AudioContext();
+
+        
+
+                    const soundType = document.getElementById('soundSelect').value;
+
+                    if (soundType === 'none') return;
+
+        
+
+                    const bufferSize = audioCtx.sampleRate * 2;
+
+                    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+
+                    const data = buffer.getChannelData(0);
+
+        
+
+                    // Noise generation
+
+                    if (soundType === 'rain') { // Brown Noise
+
+                        let lastOut = 0;
+
+                        for (let i = 0; i < bufferSize; i++) {
+
+                            const white = Math.random() * 2 - 1;
+
+                            lastOut = (lastOut + (0.02 * white)) / 1.02;
+
+                            data[i] = lastOut * 3.5;
+
+                        }
+
+                    } else if (soundType === 'white') { // White Noise
+
+                        for (let i = 0; i < bufferSize; i++) {
+
+                            data[i] = (Math.random() * 2 - 1) * 0.4;
+
+                        }
+
+                    } else if (soundType === 'pink') { // Pink Noise
+
+                        let b0 = 0, b1 = 0, b2 = 0, b3 = 0, b4 = 0, b5 = 0, b6 = 0;
+
+                        for (let i = 0; i < bufferSize; i++) {
+
+                            const white = Math.random() * 2 - 1;
+
+                            b0 = 0.99886 * b0 + white * 0.0555179;
+
+                            b1 = 0.99332 * b1 + white * 0.0750759;
+
+                            b2 = 0.96900 * b2 + white * 0.1538520;
+
+                            b3 = 0.86650 * b3 + white * 0.3104856;
+
+                            b4 = 0.55000 * b4 + white * 0.5329522;
+
+                            b5 = -0.7616 * b5 - white * 0.0168980;
+
+                            data[i] = (b0 + b1 + b2 + b3 + b4 + b5 + b6 + white * 0.5362) * 0.11;
+
+                            b6 = white * 0.115926;
+
+                        }
+
+                    }
+
+        
+
+                    soundNode = audioCtx.createBufferSource();
+
+                    soundNode.buffer = buffer;
+
+                    soundNode.loop = true;
+
+        
+
+                    // Filtering for rain sound
+
+                    if (soundType === 'rain') {
+
+                        const filter = audioCtx.createBiquadFilter();
+
+                        filter.type = 'lowpass';
+
+                        filter.frequency.value = 400;
+
+                        soundNode.connect(filter);
+
+                        filter.connect(audioCtx.destination);
+
+                    } else {
+
+                        soundNode.connect(audioCtx.destination);
+
+                    }
+
+                    
+
+                    soundNode.start(0);
+
+                    audioCtx.suspend(); // Start suspended
+
+                }
 
     
 
