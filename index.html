@@ -1,0 +1,501 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Indian Atlas Sleep</title>
+    <style>
+        /* SLEEP UI: Pitch Black */
+        body {
+            background-color: #000000;
+            color: #555;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            touch-action: manipulation;
+        }
+
+        /* The Breathing Core */
+        #core {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            background: #111;
+            transition: all 0.5s ease;
+            box-shadow: 0 0 10px rgba(255,255,255,0.05);
+            margin-bottom: 40px;
+        }
+
+        /* States */
+        .listening {
+            background: #152838 !important; /* Muted Navy */
+            animation: breathe 4s infinite ease-in-out;
+            box-shadow: 0 0 40px rgba(30, 60, 90, 0.4);
+        }
+        .speaking {
+            background: #382815 !important; /* Muted Amber */
+            box-shadow: 0 0 30px rgba(90, 60, 30, 0.3);
+            transform: scale(1.05);
+        }
+
+        @keyframes breathe {
+            0% { transform: scale(1); opacity: 0.7; }
+            50% { transform: scale(1.2); opacity: 1; }
+            100% { transform: scale(1); opacity: 0.7; }
+        }
+
+        #status {
+            font-size: 18px;
+            font-weight: 300;
+            color: #444;
+            min-height: 24px;
+            text-align: center;
+        }
+
+        /* Controls */
+        .controls {
+            position: absolute;
+            bottom: 50px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            width: 80%;
+            max-width: 300px;
+        }
+
+        select {
+            padding: 12px;
+            background: #111;
+            color: #888;
+            border: 1px solid #333;
+            border-radius: 8px;
+            font-size: 14px;
+            outline: none;
+            width: 100%;
+        }
+
+        button {
+            padding: 16px;
+            background: #222;
+            color: #ccc;
+            border: none;
+            border-radius: 30px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:active { background: #333; }
+        
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+        <div id="core"></div>
+
+        <div id="status">...</div>
+
+    
+
+        <div class="controls" id="setupPanel">
+
+            <select id="voiceSelect" onchange="testVoice()">
+
+                <option value="">Loading voices...</option>
+
+            </select>
+
+            <div style="display: flex; gap: 10px;">
+
+                <button onclick="toggleRain()" id="rainBtn" style="flex:1;">Turn On Rain</button>
+
+                <button onclick="initGame()" style="flex:2;">Start Sleep Session</button>
+
+            </div>
+
+        </div>
+
+    
+
+    <script src="cities.js"></script>
+
+    <script>
+
+        // --- SLEEP ENGINE ---
+
+        
+
+        const SLEEP_TIMEOUT_MS = 10 * 60 * 1000; // 10 Minutes
+
+        const FILLERS = ["Hmm... ", "Let me see... ", "Okay... ", "Right... ", "Thinking... ", "Ah... ", "Good one... ", ""];
+
+    
+
+        let usedWords = new Set();
+
+        let lastLetter = null;
+
+        let selectedVoice = null;
+
+        let recognition;
+
+        let sleepTimer;
+
+        let audioCtx;
+
+        let rainNode;
+
+        let isRainOn = false;
+
+        const synth = window.speechSynthesis;
+
+    
+
+        // --- 1. VOICE SETUP ---
+
+        function loadVoices() {
+
+            const voices = synth.getVoices();
+
+            const select = document.getElementById('voiceSelect');
+
+            const savedVoice = localStorage.getItem('selectedVoice');
+
+            select.innerHTML = '';
+
+            
+
+            voices.sort((a, b) => {
+
+                const aScore = (a.name.includes("Google") ? 2 : 0) + (a.lang.includes("IN") ? 1 : 0);
+
+                const bScore = (b.name.includes("Google") ? 2 : 0) + (b.lang.includes("IN") ? 1 : 0);
+
+                return bScore - aScore;
+
+            });
+
+    
+
+            let foundSaved = false;
+
+            voices.forEach((voice) => {
+
+                const option = document.createElement('option');
+
+                option.textContent = `${voice.name} (${voice.lang})`;
+
+                option.value = voice.name;
+
+                if (voice.name === savedVoice) {
+
+                    option.selected = true;
+
+                    selectedVoice = voice;
+
+                    foundSaved = true;
+
+                }
+
+                select.appendChild(option);
+
+            });
+
+            if (!foundSaved && voices.length > 0) selectedVoice = voices[0];
+
+        }
+
+    
+
+        loadVoices();
+
+        if (speechSynthesis.onvoiceschanged !== undefined) speechSynthesis.onvoiceschanged = loadVoices;
+
+    
+
+        function testVoice() {
+
+            const name = document.getElementById('voiceSelect').value;
+
+            selectedVoice = synth.getVoices().find(v => v.name === name);
+
+            localStorage.setItem('selectedVoice', name);
+
+            speak("Is this soothing enough?", false);
+
+        }
+
+    
+
+        function speak(text, callback) {
+
+            resetSleepTimer(); 
+
+            document.getElementById('core').className = 'speaking';
+
+            document.getElementById('status').innerText = text;
+
+            const u = new SpeechSynthesisUtterance(text);
+
+            if (selectedVoice) u.voice = selectedVoice;
+
+            u.rate = 0.8; 
+
+            u.pitch = 0.85; 
+
+            u.onend = () => {
+
+                document.getElementById('core').className = '';
+
+                if (callback) callback();
+
+            };
+
+            synth.speak(u);
+
+        }
+
+    
+
+        // --- 2. BROWN NOISE (RAIN) ---
+
+        function toggleRain() {
+
+            if (isRainOn) {
+
+                if (audioCtx) audioCtx.suspend();
+
+                document.getElementById('rainBtn').innerText = "Turn On Rain";
+
+                isRainOn = false;
+
+            } else {
+
+                if (!audioCtx) initAudio();
+
+                audioCtx.resume();
+
+                document.getElementById('rainBtn').innerText = "Turn Off Rain";
+
+                isRainOn = true;
+
+            }
+
+        }
+
+    
+
+        function initAudio() {
+
+            const AudioContext = window.AudioContext || window.webkitAudioContext;
+
+            audioCtx = new AudioContext();
+
+            const bufferSize = audioCtx.sampleRate * 2;
+
+            const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+
+            const data = buffer.getChannelData(0);
+
+            let lastOut = 0;
+
+            for (let i = 0; i < bufferSize; i++) {
+
+                const white = Math.random() * 2 - 1;
+
+                lastOut = (lastOut + (0.02 * white)) / 1.02;
+
+                data[i] = lastOut * 0.3; 
+
+            }
+
+            rainNode = audioCtx.createBufferSource();
+
+            rainNode.buffer = buffer;
+
+            rainNode.loop = true;
+
+            const filter = audioCtx.createBiquadFilter();
+
+            filter.type = 'lowpass';
+
+            filter.frequency.value = 350;
+
+            rainNode.connect(filter);
+
+            filter.connect(audioCtx.destination);
+
+            rainNode.start(0);
+
+        }
+
+    
+
+        // --- 3. SILENT KILL TIMER ---
+
+        function resetSleepTimer() {
+
+            clearTimeout(sleepTimer);
+
+            sleepTimer = setTimeout(enterDeepSleep, SLEEP_TIMEOUT_MS);
+
+        }
+
+    
+
+        function enterDeepSleep() {
+
+            if (recognition) {
+
+                recognition.onresult = null;
+
+                recognition.onerror = null;
+
+                recognition.onend = null;
+
+                try { recognition.stop(); } catch(e){}
+
+            }
+
+            synth.cancel(); // Stop any current speech
+
+            if (audioCtx) audioCtx.close();
+
+            document.body.style.backgroundColor = "#000";
+
+            document.getElementById('core').style.display = 'none';
+
+            document.getElementById('status').innerText = "";
+
+        }
+
+    
+
+        // --- 4. GAME LOGIC ---
+
+        function initGame() {
+
+            document.getElementById('setupPanel').classList.add('hidden');
+
+            try { navigator.wakeLock.request('screen'); } catch(e){}
+
+            const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+            recognition = new SpeechRecognition();
+
+            recognition.lang = "en-IN";
+
+            recognition.onresult = (event) => {
+
+                const heard = event.results[0][0].transcript.trim().replace(".","");
+
+                document.getElementById('status').innerText = `You: ${heard}`;
+
+                resetSleepTimer();
+
+                processMove(heard);
+
+            };
+
+            recognition.onend = () => {
+
+                if (document.getElementById('core').className === 'listening') {
+
+                    try { recognition.start(); } catch(e){}
+
+                }
+
+            };
+
+            resetSleepTimer();
+
+            speak("Close your eyes. Relax. I will start. Mumbai.", () => {
+
+                usedWords.add("Mumbai");
+
+                lastLetter = "i";
+
+                listen();
+
+            });
+
+        }
+
+    
+
+        function listen() {
+
+            document.getElementById('core').className = 'listening';
+
+            document.getElementById('status').innerText = "Listening...";
+
+            try { recognition.start(); } catch(e){}
+
+        }
+
+    
+
+        function processMove(rawWord) {
+
+            const city = rawWord.split(" ")[0]; 
+
+            const cleanCity = city.charAt(0).toUpperCase() + city.slice(1).toLowerCase();
+
+            if (!CITIES_DB.includes(cleanCity)) {
+
+                speak(`Hmm... let's try a word with ${lastLetter}.`, listen);
+
+                return;
+
+            }
+
+            if (usedWords.has(cleanCity) || cleanCity.toLowerCase().charAt(0) !== lastLetter.toLowerCase()) {
+
+                speak(`Try another one with ${lastLetter}.`, listen);
+
+                return;
+
+            }
+
+            usedWords.add(cleanCity);
+
+            const nextChar = cleanCity.slice(-1);
+
+            setTimeout(() => botReply(nextChar), Math.random() * 2000 + 2000);
+
+        }
+
+    
+
+        function botReply(char) {
+
+            const candidates = CITIES_DB.filter(c => c.toLowerCase().startsWith(char.toLowerCase()) && !usedWords.has(c));
+
+            if (candidates.length === 0) {
+
+                enterDeepSleep(); // End silently if stuck
+
+                return;
+
+            }
+
+            const choice = candidates[Math.floor(Math.random() * candidates.length)];
+
+            usedWords.add(choice);
+
+            lastLetter = choice.slice(-1);
+
+            let prefix = Math.random() > 0.6 ? FILLERS[Math.floor(Math.random() * FILLERS.length)] : "";
+
+            speak(`${prefix} ${choice}. Your turn with ${lastLetter}.`, listen);
+
+        }
+
+    </script>
+</body>
+</html>
