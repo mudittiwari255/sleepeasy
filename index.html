@@ -330,45 +330,21 @@
         }
 
         // --- 2. AMBIENT SOUND ENGINE ---
-        function soundChanged() {
-            if (isSoundOn) {
-                if (soundNode) soundNode.disconnect();
-                initAudio();
-                audioCtx.resume();
+        
+        function createAndStartSoundNode(soundType) {
+            if (!audioCtx || soundType === 'none') return;
+
+            // Stop any existing node
+            if (soundNode) {
+                soundNode.stop();
+                soundNode.disconnect();
             }
-        }
-
-        function toggleSound() {
-            const sound = document.getElementById('soundSelect').value;
-            if (sound === 'none') return;
-
-            if (isSoundOn) {
-                if (audioCtx) audioCtx.suspend();
-                document.getElementById('soundBtn').innerText = "Turn On";
-                isSoundOn = false;
-            } else {
-                if (!audioCtx) initAudio();
-                audioCtx.resume();
-                document.getElementById('soundBtn').innerText = "Turn Off";
-                isSoundOn = true;
-            }
-        }
-
-        function initAudio() {
-            if (audioCtx) {
-                audioCtx.close();
-            }
-            const AudioContext = window.AudioContext || window.webkitAudioContext;
-            audioCtx = new AudioContext();
-
-            const soundType = document.getElementById('soundSelect').value;
-            if (soundType === 'none') return;
 
             const bufferSize = audioCtx.sampleRate * 2;
             const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
             const data = buffer.getChannelData(0);
 
-            // Noise generation
+            // Noise generation algorithms
             if (soundType === 'rain') { // Brown Noise
                 let lastOut = 0;
                 for (let i = 0; i < bufferSize; i++) {
@@ -394,12 +370,11 @@
                     b6 = white * 0.115926;
                 }
             }
-
+            
             soundNode = audioCtx.createBufferSource();
             soundNode.buffer = buffer;
             soundNode.loop = true;
 
-            // Filtering for rain sound
             if (soundType === 'rain') {
                 const filter = audioCtx.createBiquadFilter();
                 filter.type = 'lowpass';
@@ -411,7 +386,52 @@
             }
             
             soundNode.start(0);
-            audioCtx.suspend(); // Start suspended
+        }
+
+        function soundChanged() {
+            const soundType = document.getElementById('soundSelect').value;
+            if (isSoundOn) {
+                if (soundType === 'none') {
+                    // If user selects "No Sound" while a sound is playing, turn it off
+                    isSoundOn = false;
+                    document.getElementById('soundBtn').innerText = "Turn On";
+                    if (audioCtx) audioCtx.suspend();
+                    if (soundNode) {
+                        soundNode.stop();
+                        soundNode.disconnect();
+                        soundNode = null;
+                    }
+                } else {
+                    // If a sound is already playing, just switch to the new one
+                    createAndStartSoundNode(soundType);
+                }
+            }
+        }
+
+        function toggleSound() {
+            const soundType = document.getElementById('soundSelect').value;
+            const btn = document.getElementById('soundBtn');
+
+            if (!isSoundOn && soundType === 'none') {
+                return; // Do nothing if trying to turn on "No Sound"
+            }
+            
+            isSoundOn = !isSoundOn;
+
+            if (isSoundOn) {
+                // Turning ON
+                if (!audioCtx) {
+                    const AudioContext = window.AudioContext || window.webkitAudioContext;
+                    audioCtx = new AudioContext();
+                }
+                createAndStartSoundNode(soundType);
+                audioCtx.resume();
+                btn.innerText = "Turn Off";
+            } else {
+                // Turning OFF
+                if (audioCtx) audioCtx.suspend();
+                btn.innerText = "Turn On";
+            }
         }
 
         // --- 3. SILENT KILL TIMER ---
