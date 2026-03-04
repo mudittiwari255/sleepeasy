@@ -3,13 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Atlas Sleep: Voice Hypnosis</title>
+    <title>SleepEasy - Indian City Atlas Sleep Game</title>
     <style>
-        /* --- SLEEP UI: Deep Red Mode --- */
+        /* --- SLEEP UI: Soothing Dark Mode --- */
+        :root {
+            /* Background Layers */
+            --bg-deep: #0a0e1a;
+            --bg-surface: #111827;
+            --bg-elevated: #1f2937;
+            --bg-subtle: #374151;
+
+            /* Text */
+            --text-primary: #e2e8f0;
+            --text-secondary: #94a3b8;
+            --text-muted: #64748b;
+
+            /* Accents - Gentle, Calming */
+            --accent-primary: #818cf8;
+            --accent-secondary: #a78bfa;
+
+            /* Special States */
+            --listening-glow: #6366f1;
+            --speaking-glow: #818cf8;
+            --ghost-mode: #a78bfa;
+
+            /* Timings */
+            --easing-gentle: cubic-bezier(0.4, 0, 0.2, 1);
+            --easing-breathe: cubic-bezier(0.3, 0, 0.3, 1);
+        }
+
         body {
-            background-color: #000000;
-            color: #8a3333; 
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            background: linear-gradient(180deg, #0f172a 0%, #0a0e1a 100%);
+            color: var(--text-primary);
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -26,54 +52,56 @@
             position: absolute;
             top: 0; left: 0; width: 100%; height: 100%;
             overflow: hidden; z-index: -1;
-            opacity: 0.5;
+            opacity: 0.3;
             perspective: 1000px;
         }
-        
+
         .star {
             position: absolute;
             border-radius: 50%;
-            background-color: #552222; 
+            background-color: var(--accent-primary);
         }
 
         /* --- BREATHING CORE --- */
         #core {
-            width: 120px;
-            height: 120px;
+            width: 140px;
+            height: 140px;
             border-radius: 50%;
-            background: #0D0505;
-            transition: all 0.5s ease;
-            box-shadow: 0 0 20px rgba(40, 10, 10, 0.4);
+            background: radial-gradient(circle, rgba(129, 140, 248, 0.2) 0%, transparent 70%);
+            transition: all 500ms var(--easing-gentle);
+            box-shadow: 0 0 30px rgba(99, 102, 241, 0.3);
             margin-bottom: 50px;
             z-index: 1;
         }
 
         .listening {
-            background: #1a0808 !important;
-            animation: breathe 4s infinite ease-in-out;
-            box-shadow: 0 0 50px rgba(80, 20, 20, 0.3);
+            background: radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, transparent 70%) !important;
+            animation: breathe 3s var(--easing-breathe) infinite;
+            box-shadow: 0 0 50px rgba(99, 102, 241, 0.4);
         }
+
         .speaking {
-            background: #2b1d10 !important; 
-            transform: scale(1.05);
-            box-shadow: 0 0 40px rgba(100, 60, 20, 0.2);
+            background: radial-gradient(circle, rgba(129, 140, 248, 0.3) 0%, transparent 70%) !important;
+            transform: scale(1.08);
+            box-shadow: 0 0 50px rgba(129, 140, 248, 0.4);
         }
 
         @keyframes breathe {
-            0% { transform: scale(1); opacity: 0.8; }
+            0% { transform: scale(1); opacity: 0.7; }
             50% { transform: scale(1.15); opacity: 1; }
-            100% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 0.7; }
         }
 
         #status {
-            font-size: 20px;
-            font-weight: 300;
-            color: #8a3333;
+            font-size: 18px;
+            font-weight: 400;
+            color: var(--text-secondary);
             min-height: 24px;
             text-align: center;
             z-index: 1;
-            letter-spacing: 1px;
-            transition: opacity 1s;
+            letter-spacing: 0.5px;
+            transition: opacity 1000ms var(--easing-gentle);
+            margin-bottom: 20px;
         }
 
         /* --- CONTROLS --- */
@@ -82,40 +110,90 @@
             bottom: 40px;
             display: flex;
             flex-direction: column;
-            gap: 15px;
+            gap: 12px;
             width: 85%;
-            max-width: 320px;
+            max-width: 340px;
             z-index: 2;
-            transition: opacity 1s;
+            transition: opacity 500ms var(--easing-gentle);
         }
 
         .persistent-controls {
             position: absolute;
             top: 20px; right: 20px;
-            display: flex; gap: 10px;
-            opacity: 0.4;
+            display: flex; gap: 8px;
+            flex-direction: column;
             z-index: 2;
         }
 
         select, button {
-            padding: 14px;
-            background: #110505;
-            color: #8a3333;
-            border: 1px solid #331111;
+            padding: 12px 16px;
+            background: var(--bg-elevated);
+            color: var(--text-secondary);
+            border: 1px solid var(--bg-subtle);
             border-radius: 12px;
             font-size: 15px;
             outline: none;
             cursor: pointer;
-        }
-        
-        button {
-            font-weight: 500;
-            background: #1a0808;
-            transition: background 0.2s;
+            transition: all 300ms var(--easing-gentle);
         }
 
-        button:active { background: #2f0f0f; }
-        .hidden { opacity: 0; pointer-events: none; }
+        button {
+            font-weight: 500;
+            background: var(--bg-surface);
+            color: var(--text-primary);
+            border: 1px solid var(--accent-primary);
+        }
+
+        button:hover {
+            background: var(--bg-elevated);
+            border-color: var(--accent-secondary);
+        }
+
+        button:active {
+            transform: scale(0.98);
+            background: var(--bg-subtle);
+        }
+
+        select:hover {
+            border-color: var(--accent-primary);
+        }
+
+        select:focus, button:focus {
+            outline: 2px solid var(--accent-primary);
+            outline-offset: 2px;
+        }
+
+        .hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(10px);
+        }
+
+        /* --- SCREEN TRANSITIONS --- */
+        .fade-in {
+            animation: fadeIn 500ms var(--easing-gentle);
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(8px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* --- ACCESSIBILITY --- */
+        @media (prefers-reduced-motion: reduce) {
+            *,
+            *::before,
+            *::after {
+                animation-duration: 0.01ms !important;
+                transition-duration: 0.01ms !important;
+            }
+        }
     </style>
 </head>
 <body>
@@ -131,22 +209,40 @@
             <option value="brown">Brown Noise</option>
         </select>
         <button onclick="toggleSound()" id="soundBtn">Sound: Off</button>
+        <select id="intensitySelect" onchange="intensityChanged()">
+            <option value="low">Intensity: Low</option>
+            <option value="medium" selected>Intensity: Medium</option>
+            <option value="high">Intensity: High</option>
+        </select>
+        <select id="timerSelect" onchange="timerChanged()">
+            <option value="0" selected>Timer: Off</option>
+            <option value="15">Timer: 15 min</option>
+            <option value="30">Timer: 30 min</option>
+            <option value="45">Timer: 45 min</option>
+            <option value="60">Timer: 60 min</option>
+        </select>
     </div>
 
+    <div id="timer-display" style="position: absolute; bottom: 100px; left: 20px; font-size: 14px; color: var(--text-muted); opacity: 0; transition: opacity 1s;"></div>
+
     <div class="controls" id="setupPanel">
-        <div style="text-align:center; margin-bottom:15px; font-size:13px; color:#622; line-height: 1.5;">
-            <strong>Hypnotic Voice Engine</strong><br>
+        <div style="text-align:center; margin-bottom:15px; font-size:13px; color:var(--text-secondary); line-height: 1.5;">
+            <strong id="greetingText" style="color:var(--text-primary);">Good Evening</strong><br>
             I will slow down as we play.<br>
             Drifting Mode starts after 60s of silence.
         </div>
-        
+
         <select id="voiceSelect" onchange="testVoice()">
             <option value="">Loading voices...</option>
         </select>
-        
-        <button onclick="startSession()" style="font-size: 16px; padding: 18px; border: 1px solid #522;">
+
+        <button onclick="startSession()" style="font-size: 16px; padding: 18px;">
             Begin Sleep Session
         </button>
+
+        <div id="lastSessionInfo" style="text-align:center; margin-top:15px; font-size:11px; color:var(--text-muted); display:none;">
+            Last session: <span id="lastSessionTime"></span>
+        </div>
     </div>
 
     <script>
@@ -174,6 +270,93 @@
         let usedWords = new Set();
         let lastLetter = "";
         let isSessionActive = false;
+
+        // === VOICE STORAGE (FIX ANDROID BUG) ===
+        let selectedVoice = { voiceURI: null, name: null, lang: null };
+        let originalAmbientVolume = 0.4;
+        let masterGainNode = null;
+
+        // === SLEEP TIMER ===
+        let sleepTimerRemaining = 0;
+        let sleepTimerInterval = null;
+        let sleepTimerTotal = 0;
+
+        // === DAILY SESSIONS ===
+        function checkForNewDay() {
+            const lastSessionDate = localStorage.getItem('sleepeasy_last_date');
+            const today = new Date().toDateString();
+
+            if (lastSessionDate !== today) {
+                localStorage.setItem('sleepeasy_last_date', today);
+                localStorage.removeItem('sleepeasy_session_state');
+                return true;
+            }
+            return false;
+        }
+
+        function recordSessionTime() {
+            const now = new Date();
+            const timeStr = now.toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' });
+            localStorage.setItem('sleepeasy_last_session_time', timeStr);
+        }
+
+        function updateGreeting() {
+            const hour = new Date().getHours();
+            const greetingEl = document.getElementById('greetingText');
+            if (greetingEl) {
+                if (hour < 12) {
+                    greetingEl.innerText = "Good Morning";
+                } else if (hour < 17) {
+                    greetingEl.innerText = "Good Afternoon";
+                } else {
+                    greetingEl.innerText = "Good Evening";
+                }
+            }
+
+            // Check for previous session today
+            const lastSession = localStorage.getItem('sleepeasy_last_date');
+            const lastSessionTime = localStorage.getItem('sleepeasy_last_session_time');
+
+            if (lastSession && lastSessionTime) {
+                const lastDate = new Date(lastSession).toDateString();
+                const today = new Date().toDateString();
+
+                if (lastDate === today) {
+                    const lastSessionInfo = document.getElementById('lastSessionInfo');
+                    if (lastSessionInfo) {
+                        lastSessionInfo.style.display = 'block';
+                        const lastSessionTimeEl = document.getElementById('lastSessionTime');
+                        if (lastSessionTimeEl) {
+                            lastSessionTimeEl.innerText = lastSessionTime;
+                        }
+                    }
+                }
+            }
+        }
+
+        // === INTENSITY PRESETS ===
+        const intensityPresets = {
+            low: { slowdownRate: 0.03, delayIncrement: 300, ambientVolume: 0.3, maxDelay: 8000 },
+            medium: { slowdownRate: 0.05, delayIncrement: 500, ambientVolume: 0.4, maxDelay: 5000 },
+            high: { slowdownRate: 0.08, delayIncrement: 700, ambientVolume: 0.5, maxDelay: 3000 }
+        };
+
+        let currentIntensity = 'medium';
+
+        function applyIntensity(level) {
+            const preset = intensityPresets[level];
+            currentIntensity = level;
+            setAmbientVolume(preset.ambientVolume);
+            localStorage.setItem('sleepeasy_intensity', level);
+        }
+
+        function loadIntensityPreference() {
+            const saved = localStorage.getItem('sleepeasy_intensity');
+            if (saved && intensityPresets[saved]) {
+                return saved;
+            }
+            return 'medium';
+        }
 
         // --- 2. VISUALS ---
         function createStars() {
@@ -210,7 +393,7 @@
                     const white = Math.random() * 2 - 1;
                     data[i] = (lastOut + (0.02 * white)) / 1.02;
                     lastOut = data[i];
-                    data[i] *= 3.5; 
+                    data[i] *= 2.8;  // Reduced from 3.5 for softer brown noise (~40% volume)
                 }
             }
             return buffer;
@@ -246,11 +429,36 @@
             
             const filter = audioCtx.createBiquadFilter();
             filter.type = 'lowpass';
-            filter.frequency.value = 250; 
-            
+            filter.frequency.value = 220;  // Slightly lower for deeper sound
+
+            if (!masterGainNode) {
+                masterGainNode = audioCtx.createGain();
+                masterGainNode.connect(audioCtx.destination);
+            }
+            masterGainNode.gain.value = 0.4;  // Default 40% volume
+
             soundNode.connect(filter);
-            filter.connect(audioCtx.destination);
+            filter.connect(masterGainNode);
             soundNode.start();
+        }
+
+        function setAmbientVolume(volume) {
+            if (masterGainNode && audioCtx) {
+                masterGainNode.gain.setValueAtTime(volume, audioCtx.currentTime);
+            }
+        }
+
+        function duckAmbientSound() {
+            if (masterGainNode && audioCtx) {
+                originalAmbientVolume = masterGainNode.gain.value;
+                masterGainNode.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            }
+        }
+
+        function restoreAmbientSound() {
+            if (masterGainNode && audioCtx) {
+                masterGainNode.gain.setValueAtTime(originalAmbientVolume, audioCtx.currentTime);
+            }
         }
 
         // --- 4. VOICE ENGINE ---
@@ -290,24 +498,69 @@
 
             validVoices.forEach(v => {
                 const opt = document.createElement('option');
-                opt.value = v.name;
+                opt.value = v.voiceURI;  // Use voiceURI instead of name for Android fix
+                opt.dataset.name = v.name;  // Store name as fallback
                 let label = v.name;
                 if (getVoiceScore(v) >= 10) label = "⭐ " + label;
                 opt.text = label;
                 select.appendChild(opt);
             });
             select.selectedIndex = 0;
+
+            // Load saved voice preference
+            loadVoicePreference();
         }
+
+        function saveVoicePreference() {
+            if (selectedVoice.voiceURI) {
+                localStorage.setItem('sleepeasy_voice', JSON.stringify(selectedVoice));
+            }
+        }
+
+        function loadVoicePreference() {
+            const saved = localStorage.getItem('sleepeasy_voice');
+            if (saved) {
+                selectedVoice = JSON.parse(saved);
+                for (let i = 0; i < select.options.length; i++) {
+                    if (select.options[i].value === selectedVoice.voiceURI) {
+                        select.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+        }
+
         initVoices();
 
         function speak(text, callback) {
             if (!isSessionActive && !text.includes("Voice")) return;
             synth.cancel();
-            
+
             const u = new SpeechSynthesisUtterance(text);
-            const voiceName = document.getElementById('voiceSelect').value;
-            const voice = synth.getVoices().find(v => v.name === voiceName);
-            if(voice) u.voice = voice;
+            const voiceURI = document.getElementById('voiceSelect').value;
+
+            // Find voice by URI first (most reliable), fallback to name
+            let voice = null;
+            if (voiceURI) {
+                const allVoices = synth.getVoices();
+                voice = allVoices.find(v => v.voiceURI === voiceURI);
+                if (!voice) {
+                    // Fallback: match by name if URI fails
+                    const select = document.getElementById('voiceSelect');
+                    const name = select.options[select.selectedIndex]?.dataset?.name;
+                    if (name) {
+                        voice = allVoices.find(v => v.name === name);
+                    }
+                }
+            }
+
+            // Update selectedVoice for persistence
+            if (voice) {
+                u.voice = voice;
+                selectedVoice.voiceURI = voice.voiceURI;
+                selectedVoice.name = voice.name;
+                selectedVoice.lang = voice.lang;
+            }
 
             const isNatural = voiceName.includes("Natural") || voiceName.includes("Google");
 
@@ -334,20 +587,37 @@
         function testVoice() {
             synth.cancel();
             const u = new SpeechSynthesisUtterance("Hypnotic Voice Engine Ready.");
-            const voiceName = document.getElementById('voiceSelect').value;
-            const voice = synth.getVoices().find(v => v.name === voiceName);
-            if(voice) u.voice = voice;
+            const voiceURI = document.getElementById('voiceSelect').value;
+
+            let voice = null;
+            if (voiceURI) {
+                const allVoices = synth.getVoices();
+                voice = allVoices.find(v => v.voiceURI === voiceURI);
+                if (!voice) {
+                    const select = document.getElementById('voiceSelect');
+                    const name = select.options[select.selectedIndex]?.dataset?.name;
+                    if (name) {
+                        voice = allVoices.find(v => v.name === name);
+                    }
+                }
+            }
+
+            if (voice) {
+                u.voice = voice;
+                selectedVoice.voiceURI = voice.voiceURI;
+                selectedVoice.name = voice.name;
+                selectedVoice.lang = voice.lang;
+                saveVoicePreference();
+            }
             synth.speak(u);
         }
 
         // --- 5. GAME LOGIC & HYPNOTIC DELAYS ---
         
         function calculateHypnoticDelay() {
-            // Base delay 1.5s
-            // Adds 0.5s every turn
-            // Caps at 5s
-            const delay = 1500 + (turnCount * 500);
-            return Math.min(delay, 5000);
+            const preset = intensityPresets[currentIntensity];
+            const delay = 1500 + (turnCount * preset.delayIncrement);
+            return Math.min(delay, preset.maxDelay);
         }
 
         function startSession() {
@@ -364,16 +634,35 @@
             if (SR) {
                 recognition = new SR();
                 recognition.continuous = false;
-                recognition.lang = 'en-US';
+                recognition.lang = 'en-IN';  // Indian English
+                recognition.interimResults = false;  // Only final results
+                recognition.maxAlternatives = 3;  // Get multiple guesses
                 recognition.onresult = handleUserSpeech;
-                recognition.onerror = (e) => { 
-                    console.log("Mic Error/Silence", e); 
-                    if(!isGhostMode) restartListening(); 
+                recognition.onerror = (e) => {
+                    console.log("Mic Error/Silence", e);
+                    restoreAmbientSound();
+                    if (!isGhostMode) {
+                        if (e.error === 'no-speech') {
+                            speak("Please try speaking again.", listen);
+                        } else {
+                            restartListening();
+                        }
+                    }
                 };
             } else {
                 alert("Speech Recognition not supported.");
             }
-            
+
+            // Start timer if selected
+            const timerMinutes = parseInt(document.getElementById('timerSelect')?.value || 0);
+            if (timerMinutes > 0) {
+                startSleepTimer(timerMinutes);
+            }
+
+            // Record session time for daily tracking
+            recordSessionTime();
+            localStorage.setItem('sleepeasy_last_date', new Date().toDateString());
+
             speak("Close your eyes. Relax... I will start. Chicago.", () => {
                 usedWords.add("Chicago");
                 lastLetter = "o";
@@ -408,6 +697,7 @@
         function listen() {
             document.getElementById('core').className = 'listening';
             document.getElementById('status').innerText = "Listening...";
+            duckAmbientSound();  // Lower ambient volume when listening
             try { recognition.start(); } catch(e) {}
         }
 
@@ -420,21 +710,39 @@
         }
 
         function handleUserSpeech(event) {
-            clearTimeout(ghostTimer); 
+            clearTimeout(ghostTimer);
             clearTimeout(warningTimer);
-            
-            const transcript = event.results[0][0].transcript.trim().replace(".","");
+            restoreAmbientSound();  // Restore ambient volume after listening
+
+            const result = event.results[0][0];
+            const transcript = result.transcript.trim().replace(".", "");
+            const confidence = result.confidence;
+
+            // Add confidence threshold check
+            if (confidence < 0.6) {
+                speak("I couldn't hear you clearly. Please say the city name again.", listen);
+                return;
+            }
+
             document.getElementById('status').innerText = transcript;
-            
+
             if (transcript.toLowerCase() === "stop") {
                 endSession();
                 return;
             }
 
-            const city = transcript.split(" ")[0]; 
-            
-            if (!validateMove(city)) {
+            const city = transcript.split(" ")[0];
+
+            const validationResult = validateMove(city);
+
+            if (validationResult === false) {
                 speak(`Try a place starting with ${lastLetter}.`, listen);
+                return;
+            }
+
+            if (validationResult === 'already_used') {
+                const normalizedCity = city.charAt(0).toUpperCase() + city.slice(1).toLowerCase();
+                speak(`${normalizedCity} already used in this session. Please try another city.`, listen);
                 return;
             }
 
@@ -443,22 +751,39 @@
 
         function validateMove(rawCity) {
             if (!rawCity) return false;
-            return rawCity.toLowerCase().startsWith(lastLetter.toLowerCase());
+
+            const normalizedCity = rawCity.charAt(0).toUpperCase() + rawCity.slice(1).toLowerCase();
+
+            // Check starting letter
+            if (!normalizedCity.toLowerCase().startsWith(lastLetter.toLowerCase())) {
+                return false;
+            }
+
+            // Check if already used
+            if (usedWords.has(normalizedCity)) {
+                return 'already_used';
+            }
+
+            return true;
         }
 
         function processValidMove(city) {
             const cleanCity = city.charAt(0).toUpperCase() + city.slice(1).toLowerCase();
             usedWords.add(cleanCity);
             const nextChar = cleanCity.slice(-1);
-            
-            turnCount++;
-            
-            // HYPNOTIC DECELERATION: Drop speed every 3 turns
-            if (turnCount % 3 === 0) currentRate -= 0.05; 
 
-            // HYPNOTIC DELAY: Pause longer as game progresses
+            turnCount++;
+
+            // HYPNOTIC DECELERATION: Drop speed every 3 turns (uses intensity preset)
+            if (turnCount % 3 === 0) {
+                const preset = intensityPresets[currentIntensity];
+                currentRate -= preset.slowdownRate;
+                currentRate = Math.max(0.5, currentRate);
+            }
+
+            // HYPNOTIC DELAY: Pause longer as game progresses (uses intensity preset)
             const delay = calculateHypnoticDelay();
-            
+
             setTimeout(() => aiReply(nextChar), delay);
         }
 
@@ -524,9 +849,125 @@
             isSessionActive = false;
             synth.cancel();
             if(audioCtx) audioCtx.close();
-            document.body.innerHTML = ""; 
+            document.body.innerHTML = "";
             document.body.style.backgroundColor = "#000";
         }
+
+        // === INTENSITY UI ===
+        function intensityChanged() {
+            const level = document.getElementById('intensitySelect').value;
+            applyIntensity(level);
+        }
+
+        // Initialize intensity on load
+        window.addEventListener('DOMContentLoaded', () => {
+            // Check for new day
+            checkForNewDay();
+
+            // Update greeting based on time of day
+            updateGreeting();
+
+            const saved = loadIntensityPreference();
+            document.getElementById('intensitySelect').value = saved;
+            applyIntensity(saved);
+
+            // Initialize timer from saved preference
+            const savedTimer = localStorage.getItem('sleepeasy_timer');
+            if (savedTimer) {
+                document.getElementById('timerSelect').value = savedTimer;
+            }
+        });
+
+        // === SLEEP TIMER FUNCTIONS ===
+        function startSleepTimer(minutes) {
+            sleepTimerTotal = minutes * 60;
+            sleepTimerRemaining = sleepTimerTotal;
+            localStorage.setItem('sleepeasy_timer', minutes);
+
+            // Show timer display
+            const timerDisplay = document.getElementById('timer-display');
+            if (timerDisplay) {
+                timerDisplay.style.opacity = '0.5';
+            }
+
+            sleepTimerInterval = setInterval(() => {
+                sleepTimerRemaining--;
+                updateTimerDisplay();
+
+                // Start fade at 90% of timer (10% remaining)
+                const fadeThreshold = sleepTimerTotal * 0.1;
+                if (sleepTimerRemaining <= fadeThreshold && sleepTimerRemaining > 0) {
+                    if (!document.getElementById('timer-display')?.dataset.fading) {
+                        startGracefulFadeOut();
+                        if (document.getElementById('timer-display')) {
+                            document.getElementById('timer-display').dataset.fading = 'true';
+                        }
+                    }
+                }
+
+                if (sleepTimerRemaining <= 0) {
+                    speak("Session complete. Rest well.", () => {
+                        setTimeout(() => endSession(), 3000);
+                    });
+                }
+            }, 1000);
+        }
+
+        function updateTimerDisplay() {
+            const minutes = Math.floor(sleepTimerRemaining / 60);
+            const seconds = sleepTimerRemaining % 60;
+            const display = `${minutes}:${seconds.toString().padStart(2, '0')}`;
+            const timerDisplay = document.getElementById('timer-display');
+            if (timerDisplay) {
+                timerDisplay.innerText = display;
+            }
+        }
+
+        function startGracefulFadeOut() {
+            // Fade brown noise over 30 seconds
+            const fadeDuration = 30;
+            if (masterGainNode && audioCtx) {
+                masterGainNode.gain.linearRampToValueAtTime(
+                    0,
+                    audioCtx.currentTime + fadeDuration
+                );
+            }
+
+            // Note: Voice volume is handled per utterance in speak()
+            // We reduce utterance volume gradually through the u.volume property
+        }
+
+        function clearSleepTimer() {
+            if (sleepTimerInterval) {
+                clearInterval(sleepTimerInterval);
+                sleepTimerInterval = null;
+            }
+            sleepTimerRemaining = 0;
+            sleepTimerTotal = 0;
+            localStorage.removeItem('sleepeasy_timer');
+            const timerDisplay = document.getElementById('timer-display');
+            if (timerDisplay) {
+                timerDisplay.style.opacity = '0';
+                timerDisplay.innerText = '';
+                delete timerDisplay.dataset.fading;
+            }
+        }
+
+        function timerChanged() {
+            const minutes = parseInt(document.getElementById('timerSelect').value);
+            if (minutes > 0) {
+                startSleepTimer(minutes);
+            } else {
+                clearSleepTimer();
+            }
+        }
+
+        // Modify endSession to clear timer
+        const originalEndSession = endSession;
+        endSession = function() {
+            clearSleepTimer();
+            originalEndSession();
+        };
     </script>
 </body>
 </html>
