@@ -534,6 +534,7 @@
 
         function speak(text, callback) {
             if (!isSessionActive && !text.includes("Voice")) return;
+            console.log('speak() called with:', text, 'callback:', !!callback);
             synth.cancel();
 
             const u = new SpeechSynthesisUtterance(text);
@@ -579,10 +580,18 @@
 
             document.getElementById('core').className = 'speaking';
             u.onend = () => {
+                console.log('Speech utterance ended, calling callback:', !!callback);
                 document.getElementById('core').className = '';
                 if(callback) callback();
             };
+            u.onerror = (e) => {
+                console.error('Speech synthesis error:', e);
+                document.getElementById('core').className = '';
+                // Still call callback even on error so game continues
+                if(callback) callback();
+            };
             synth.speak(u);
+            console.log('Speech synthesis started');
         }
 
         function testVoice() {
@@ -639,6 +648,10 @@
                 recognition.interimResults = false;  // Only final results
                 recognition.maxAlternatives = 3;  // Get multiple guesses
                 recognition.onresult = handleUserSpeech;
+                recognition.onend = () => {
+                    // Recognition ended naturally (after getting result)
+                    // Don't auto-restart - let the callback chain handle it
+                };
                 recognition.onerror = (e) => {
                     console.log("Mic Error/Silence", e);
                     restoreAmbientSound();
@@ -674,6 +687,7 @@
         }
 
         function startTurn() {
+            console.log('startTurn() called, isSessionActive:', isSessionActive);
             if (!isSessionActive) return;
 
             // RESET TIMERS
