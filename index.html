@@ -248,7 +248,7 @@
     <script>
         // --- 0. DATA ---
         const CITIES_DB = [
-            "Mumbai", "Delhi", "Bangalore", "Hyderabad", "Ahmedabad", "Chennai", "Kolkata", "Surat", "Pune", "Jaipur", "Lucknow", "Kanpur", "Nagpur", "Indore", "Thane", "Bhopal", "Visakhapatnam", "Pimpri", "Patna", "Vadodara", "Ghaziabad", "Ludhiana", "Agra", "Nashik", "Faridabad", "Meerut", "Rajkot", "Varanasi", "Srinagar", "Aurangabad", "Dhanbad", "Amritsar", "Navi Mumbai", "Allahabad", "Ranchi", "Howrah", "Coimbatore", "Jabalpur", "Gwalior", "Vijayawada", "Jodhpur", "Madurai", "Raipur", "Kota", "Guwahati", "Chandigarh", "Solapur", "Hubli", "Mysore", "Tiruchirappalli", "Bareilly", "Aligarh", "Tiruppur", "Gurgaon", "Moradabad", "Jalandhar", "Bhubaneswar", "Salem", "Warangal", "Thiruvananthapuram", "Bhiwandi", "Saharanpur", "Gorakhpur", "Guntur", "Bikaner", "Amravati", "Noida", "Jamshedpur", "Bhilai", "Cuttack", "Firozabad", "Kochi", "Bhavnagar", "Dehradun", "Durgapur", "Asansol", "Nanded", "Kolhapur", "Ajmer", "Gulbarga", "Jamnagar", "Ujjain", "Loni", "Siliguri", "Jhansi", "Ulhasnagar", "Jammu", "Sangli", "Erode", "Goa", "Anand", "Ratlam", "Moga", "Abohar", "Rewa", "Puri", "Haldwani", "Karnal", "Panipat", "Rohtak", "Hisar", "Shimla", "Manali", "Kullu", "Rishikesh", "Haridwar", "Nainital", "Mussoorie", "Almora", "Pithoragarh", "Champawat", "Bageshwar", "Tezpur", "Imphal", "Shillong", "Aizawl", "Kohima", "Gangtok", "Agartala", "Itanagar", "Dispur", "Dimapur", "Silchar", "Dibrugarh", "Jorhat", "Nagaon", "Tinsukia", "Bongaigaon", "Dhubri", "Diphu", "North Lakhimpur", "Karimganj", "Sibsagar", "Goalpara", "Barpeta", "Lanka", "Hojai", "London", "Paris", "New York", "Tokyo", "Dubai", "Singapore", "Berlin", "Rome", "Madrid", "Moscow", "Toronto", "Sydney", "Melbourne", "Beijing", "Shanghai", "Hong Kong", "Bangkok", "Seoul", "Istanbul", "Cairo", "Rio", "Lima", "Nairobi", "Lagos", "Accra", "Dakar", "Chicago", "Houston", "Phoenix", "Philadelphia", "Dallas", "Austin", "Boston", "Seattle", "Denver", "Miami", "Atlanta", "Detroit", "Minneapolis", "Tampa", "Orlando", "Portland", "Vegas"
+            "Mumbai", "Delhi", "Bangalore", "Hyderabad", "Ahmedabad", "Chennai", "Kolkata", "Surat", "Pune", "Jaipur", "Lucknow", "Kanpur", "Nagpur", "Indore", "Thane", "Bhopal", "Visakhapatnam", "Pimpri", "Patna", "Vadodara", "Ghaziabad", "Ludhiana", "Agra", "Nashik", "Faridabad", "Meerut", "Rajkot", "Varanasi", "Srinagar", "Aurangabad", "Dhanbad", "Amritsar", "Navi Mumbai", "Allahabad", "Ranchi", "Howrah", "Coimbatore", "Jabalpur", "Gwalior", "Vijayawada", "Jodhpur", "Madurai", "Raipur", "Kota", "Guwahati", "Chandigarh", "Solapur", "Hubli", "Mysore", "Tiruchirappalli", "Bareilly", "Aligarh", "Tiruppur", "Gurgaon", "Moradabad", "Jalandhar", "Bhubaneswar", "Salem", "Warangal", "Thiruvananthapuram", "Bhiwandi", "Saharanpur", "Gorakhpur", "Guntur", "Bikaner", "Amravati", "Noida", "Jamshedpur", "Bhilai", "Cuttack", "Firozabad", "Kochi", "Bhavnagar", "Dehradun", "Durgapur", "Asansol", "Nanded", "Kolhapur", "Ajmer", "Gulbarga", "Jamnagar", "Ujjain", "Loni", "Siliguri", "Jhansi", "Ulhasnagar", "Jammu", "Sangli", "Erode", "Goa", "Anand", "Ratlam", "Moga", "Abohar", "Rewa", "Puri", "Haldwani", "Karnal", "Panipat", "Rohtak", "Hisar", "Shimla", "Manali", "Kullu", "Rishikesh", "Haridwar", "Nainital", "Mussoorie", "Almora", "Pithoragarh", "Champawat", "Bageshwar", "Tezpur", "Imphal", "Shillong", "Aizawl", "Kohima", "Gangtok", "Agartala", "Itanagar", "Dispur", "Dimapur", "Silchar", "Dibrugarh", "Jorhat", "Nagaon", "Tinsukia", "Bongaigaon", "Dhubri", "Diphu", "North Lakhimpur", "Karimganj", "Sibsagar", "Goalpara", "Barpeta", "Lanka", "Hojai"
         ];
 
         // --- 1. CONFIG & STATE ---
@@ -664,9 +664,11 @@
             recordSessionTime();
             localStorage.setItem('sleepeasy_last_date', new Date().toDateString());
 
-            speak("Close your eyes. Relax... I will start. Chicago.", () => {
-                usedWords.add("Chicago");
-                lastLetter = "o";
+            // Start with a random Indian city
+            const randomCity = CITIES_DB[Math.floor(Math.random() * CITIES_DB.length)];
+            speak(`Close your eyes. Relax... I will start. ${randomCity}.`, () => {
+                usedWords.add(randomCity);
+                lastLetter = randomCity.slice(-1);
                 startTurn();
             });
         }
@@ -719,8 +721,8 @@
             const transcript = result.transcript.trim().replace(".", "");
             const confidence = result.confidence;
 
-            // Add confidence threshold check
-            if (confidence < 0.6) {
+            // Add confidence threshold check (lowered from 0.6 to 0.3 for better reliability)
+            if (confidence < 0.3) {
                 speak("I couldn't hear you clearly. Please say the city name again.", listen);
                 return;
             }
